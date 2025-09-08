@@ -30,7 +30,7 @@ export interface EmailServiceDeps {
  * @returns Configured dependencies for email functions
  */
 export function createEmailDeps(config: EmailServiceConfig): EmailServiceDeps {
-  const transporter = nodemailer.createTransporter({
+  const transporter = nodemailer.createTransport({
     host: config.host,
     port: config.port,
     secure: config.port === 465, // true for 465, false for other ports

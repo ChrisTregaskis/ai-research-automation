@@ -1,4 +1,4 @@
-import { ResearchTopic } from '../src/types/schemas.js';
+import { ResearchTopic } from '../types/schemas.js';
 
 export const RESEARCH_TOPICS: ResearchTopic[] = [
   {

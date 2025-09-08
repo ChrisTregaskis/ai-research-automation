@@ -3,7 +3,7 @@
 import { config } from 'dotenv';
 import { conductResearch, createResearchDeps } from './services/research-service.js';
 import { sendResearchSummary, testEmailConfiguration, createEmailDeps } from './services/email-service.js';
-import { getCurrentTopic } from '../config/research-topics.js';
+import { getCurrentTopic } from './config/research-topics.js';
 import { EnvSchema, ConfigurationError, ResearchAutomationError } from './types/schemas.js';
 import { createModuleLogger } from './utils/logger.js';
 
