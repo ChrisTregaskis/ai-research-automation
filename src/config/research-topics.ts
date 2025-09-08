@@ -114,11 +114,58 @@ export const RESEARCH_TOPICS: ResearchTopic[] = [
   }
 ];
 
+/**
+ * Day abbreviation mapping for CLI arguments
+ */
+const DAY_ABBREVIATIONS: Record<string, number> = {
+  'mon': 1,
+  'tue': 2,
+  'wed': 3,
+  'thu': 4,
+  'fri': 5,
+  'monday': 1,
+  'tuesday': 2,
+  'wednesday': 3,
+  'thursday': 4,
+  'friday': 5,
+};
+
+/**
+ * Gets research topic by day of week number
+ * @param dayOfWeek - Day of week (1=Monday, 5=Friday)
+ * @returns Research topic or null if not found
+ */
 export const getTopicByDay = (dayOfWeek: number): ResearchTopic | null => {
   return RESEARCH_TOPICS.find(topic => topic.dayOfWeek === dayOfWeek) || null;
 };
 
-export const getCurrentTopic = (): ResearchTopic | null => {
+/**
+ * Gets research topic by day abbreviation
+ * @param dayAbbr - Day abbreviation (mon, tue, wed, thu, fri)
+ * @returns Research topic or null if not found
+ */
+export const getTopicByDayAbbr = (dayAbbr: string): ResearchTopic | null => {
+  const dayNumber = DAY_ABBREVIATIONS[dayAbbr.toLowerCase()];
+  return dayNumber ? getTopicByDay(dayNumber) : null;
+};
+
+/**
+ * Gets current topic based on today's date or CLI override
+ * @param dayOverride - Optional day override from CLI arguments
+ * @returns Research topic or null if weekend/not found
+ */
+export const getCurrentTopic = (dayOverride?: string): ResearchTopic | null => {
+  // If day override provided via CLI, use that
+  if (dayOverride) {
+    const topic = getTopicByDayAbbr(dayOverride);
+    if (topic) {
+      return topic;
+    }
+    // If invalid override, log warning but continue with normal logic
+    console.warn(`Warning: Unknown day abbreviation '${dayOverride}'. Using current day instead.`);
+  }
+
+  // Default behavior: use current day
   const today = new Date();
   const dayOfWeek = today.getDay();
   

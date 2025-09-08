@@ -1,4 +1,4 @@
-# AI Research Automation
+# AIRA - (AI Research Automation)
 
 A prototype for an automated research system that uses Claude Pro to discover and summarize the latest AI/development tools, frameworks, and best practices. Delivers daily email summaries on a rotating schedule of topics tailored for senior software engineers.
 
@@ -15,13 +15,13 @@ This is built in such a way that we may be able to swap out context and desired 
 
 ## Research Schedule
 
-| Day | Topic | Focus Areas |
-|-----|-------|-------------|
-| **Monday** | AI/ML Tools & LangChain | LangChain/LangGraph updates, AI frameworks, vector databases |
-| **Tuesday** | React/Next.js & TypeScript | React 19+, Next.js App Router, TypeScript tooling, testing |
-| **Wednesday** | AWS & Serverless (SST) | SST framework, Lambda patterns, AWS CDK, serverless APIs |
-| **Thursday** | DevOps & CI/CD | GitHub Actions, Docker, Kubernetes, observability tools |
-| **Friday** | VS Code & Productivity | Extensions, IDE improvements, developer workflow tools |
+| Day           | Topic                      | Focus Areas                                                  |
+| ------------- | -------------------------- | ------------------------------------------------------------ |
+| **Monday**    | AI/ML Tools & LangChain    | LangChain/LangGraph updates, AI frameworks, vector databases |
+| **Tuesday**   | React/Next.js & TypeScript | React 19+, Next.js App Router, TypeScript tooling, testing   |
+| **Wednesday** | AWS & Serverless (SST)     | SST framework, Lambda patterns, AWS CDK, serverless APIs     |
+| **Thursday**  | DevOps & CI/CD             | GitHub Actions, Docker, Kubernetes, observability tools      |
+| **Friday**    | VS Code & Productivity     | Extensions, IDE improvements, developer workflow tools       |
 
 ## Tech Stack
 
@@ -55,6 +55,7 @@ nano .env
 ```
 
 Required environment variables:
+
 - `ANTHROPIC_API_KEY`: Your Claude API key from [console.anthropic.com](https://console.anthropic.com/)
 - `EMAIL_USER`: Your Gmail address
 - `EMAIL_PASS`: Gmail app password (not your regular password)
@@ -74,7 +75,7 @@ npm start
 
 1. **Add Repository Secrets** (Settings → Secrets and variables → Actions):
    - `ANTHROPIC_API_KEY`
-   - `EMAIL_USER` 
+   - `EMAIL_USER`
    - `EMAIL_PASS`
    - `EMAIL_RECIPIENTS`
 
@@ -153,30 +154,39 @@ npm run format:check
 ### Common Issues & Solutions
 
 #### 1. Authentication Errors
+
 ```bash
 # Claude API Error
 Error: 401 Unauthorized
 ```
+
 **Solutions:**
+
 - Verify `ANTHROPIC_API_KEY` in repository secrets
 - Check API key hasn't expired at console.anthropic.com
 - Ensure sufficient credits in Claude account
 
 #### 2. Email Delivery Failures
+
 ```bash
 # SMTP Auth Error
 Error: EAUTH - Authentication failed
 ```
+
 **Solutions:**
+
 - Use Gmail app password, not regular password
 - Enable 2-factor authentication on Gmail
 - Check `EMAIL_USER` and `EMAIL_PASS` in secrets
 
 #### 3. Research Quality Issues
+
 ```bash
 # Empty or irrelevant results
 ```
+
 **Solutions:**
+
 - Review research topics in `config/research-topics.ts`
 - Adjust search terms for current trends
 - Modify prompt templates in research service
@@ -194,18 +204,21 @@ npm run validate
 ## Cost Management
 
 ### Current Costs
+
 - **Claude Pro**: £18/month (includes Research feature)
 - **GitHub Actions**: Free (2,000 minutes/month)
 - **Email**: Free (Gmail SMTP)
 - **Total**: £18/month
 
 ### Token Usage Optimization
+
 - Uses Claude Sonnet 4 (cost-effective)
 - Monitors token usage in logs
 - Configurable prompt length
 - Research caching (future enhancement)
 
 ### Scaling Considerations
+
 - GitHub Actions free tier: 2,000 minutes/month
 - Current usage: ~5 minutes/day = 100 minutes/month
 - Room for 20x growth before hitting limits

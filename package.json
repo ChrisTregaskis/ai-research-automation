@@ -15,6 +15,11 @@
     "clean": "rm -rf dist",
     "test": "echo \"Error: no test specified\" && exit 1",
     "test:email": "node dist/index.js --test-email",
+    "research:mon": "DAY=mon node dist/index.js",
+    "research:tue": "DAY=tue node dist/index.js",
+    "research:wed": "DAY=wed node dist/index.js",
+    "research:thu": "DAY=thu node dist/index.js",
+    "research:fri": "DAY=fri node dist/index.js",
     "lint": "eslint src/**/*.ts",
     "lint:fix": "eslint src/**/*.ts --fix",
     "format": "prettier --write src/**/*.ts",
@@ -35,13 +40,13 @@
     "aws",
     "serverless"
   ],
-  "author": "Your Name <your.email@example.com>",
+  "author": "Chris Tregaskis <c.tregaskis@googlemail.com>",
   "license": "MIT",
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.24.3",
+    "@anthropic-ai/sdk": "^0.61.0",
+    "dotenv": "^16.4.5",
     "nodemailer": "^6.9.14",
-    "zod": "^3.23.8",
-    "dotenv": "^16.4.5"
+    "zod": "^3.23.8"
   },
   "devDependencies": {
     "@types/node": "^20.14.10",
@@ -59,10 +64,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/yourusername/ai-research-automation.git"
+    "url": "git+https://github.com/ChrisTregaskis/ai-research-automation.git"
   },
   "bugs": {
-    "url": "https://github.com/yourusername/ai-research-automation/issues"
+    "url": "https://github.com/ChrisTregaskis/ai-research-automation/issues"
   },
-  "homepage": "https://github.com/yourusername/ai-research-automation#readme"
+  "homepage": "https://github.com/ChrisTregaskis/ai-research-automation#readme"
 }

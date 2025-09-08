@@ -26,10 +26,12 @@ export const ClaudeResponseSchema = z.object({
   id: z.string(),
   type: z.literal('message'),
   role: z.literal('assistant'),
-  content: z.array(z.object({
-    type: z.literal('text'),
-    text: z.string(),
-  })),
+  content: z.array(
+    z.object({
+      type: z.literal('text'),
+      text: z.string(),
+    })
+  ),
   model: z.string(),
   stop_reason: z.string().nullable(),
   stop_sequence: z.string().nullable(),
@@ -53,11 +55,13 @@ export const ResearchResultSchema = z.object({
   topic: ResearchTopicSchema,
   content: z.string(),
   htmlContent: z.string(),
-  sources: z.array(z.object({
-    title: z.string(),
-    url: z.string().url(),
-    description: z.string().optional(),
-  })),
+  sources: z.array(
+    z.object({
+      title: z.string(),
+      url: z.string().url(),
+      description: z.string().optional(),
+    })
+  ),
   generatedAt: z.date(),
   tokenUsage: z.object({
     input: z.number(),

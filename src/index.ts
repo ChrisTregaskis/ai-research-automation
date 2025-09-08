@@ -77,19 +77,29 @@ async function runDailyResearch(): Promise<void> {
   logger.info('Starting AI Research Automation');
   logger.info(`Current time: ${new Date().toLocaleString('en-GB')}`);
 
+  // Check for day override from environment variable
+  const dayOverride = process.env.DAY;
+  if (dayOverride) {
+    logger.info(`Day override specified: ${dayOverride.toUpperCase()}`);
+  }
+
   try {
     // Validate environment and initialize services
     const env = await validateEnvironment();
     const { researchDeps, emailDeps } = await initializeServices(env);
 
-    // Get today's research topic
-    const topic = getCurrentTopic();
+    // Get research topic (with optional day override)
+    const topic = getCurrentTopic(dayOverride);
     if (!topic) {
-      logger.info('No research topic scheduled for today (weekend)');
+      if (dayOverride) {
+        logger.error(`No research topic found for day: ${dayOverride}`);
+      } else {
+        logger.info('No research topic scheduled for today (weekend)');
+      }
       return;
     }
 
-    logger.info(`Today's research topic: ${topic.name}`);
+    logger.info(`Research topic: ${topic.name}`);
     logger.info(`Focus areas: ${topic.focusAreas.slice(0, 3).join(', ')}...`);
 
     // Conduct research
@@ -173,9 +183,21 @@ async function main(): Promise<void> {
 AI Research Automation
 
 Usage:
-  npm start                 Run daily research automation
+  npm start                 Run daily research automation (based on current day)
+  npm run research:mon      Run Monday's research (AI/ML & LangChain)
+  npm run research:tue      Run Tuesday's research (React/Next.js)
+  npm run research:wed      Run Wednesday's research (AWS & SST)
+  npm run research:thu      Run Thursday's research (DevOps & CI/CD)
+  npm run research:fri      Run Friday's research (VS Code & Productivity)
   npm run test:email        Test email configuration
   npm run dev              Run in development mode
+
+Research Topics:
+  research:mon             AI/ML Development Tools & LangChain Ecosystem
+  research:tue             React/Next.js & TypeScript Ecosystem  
+  research:wed             AWS & Serverless Architecture (SST Focus)
+  research:thu             DevOps, CI/CD & Development Automation
+  research:fri             VS Code Extensions & Developer Productivity
 
 Environment Variables Required:
   ANTHROPIC_API_KEY        Your Claude API key
@@ -187,7 +209,8 @@ Environment Variables Required:
 
 Examples:
   npm start                        # Run today's research
-  npm start -- --test-email        # Test email configuration
+  npm run research:mon             # Test Monday's AI/ML research
+  npm run test:email               # Test email configuration
     `);
     return;
   }
