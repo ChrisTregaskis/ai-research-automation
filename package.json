@@ -1,0 +1,68 @@
+{
+  "name": "ai-research-automation",
+  "version": "1.0.0",
+  "description": "Automated AI/development tools research using Claude Pro with daily email summaries",
+  "type": "module",
+  "main": "dist/index.js",
+  "bin": {
+    "ai-research": "dist/index.js"
+  },
+  "scripts": {
+    "start": "node dist/index.js",
+    "dev": "tsx src/index.ts",
+    "build": "tsc",
+    "build:watch": "tsc --watch",
+    "clean": "rm -rf dist",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "test:email": "node dist/index.js --test-email",
+    "lint": "eslint src/**/*.ts",
+    "lint:fix": "eslint src/**/*.ts --fix",
+    "format": "prettier --write src/**/*.ts",
+    "format:check": "prettier --check src/**/*.ts",
+    "type-check": "tsc --noEmit",
+    "validate": "npm run type-check && npm run lint && npm run format:check",
+    "prepare": "npm run build"
+  },
+  "keywords": [
+    "ai",
+    "automation",
+    "research",
+    "claude",
+    "typescript",
+    "email",
+    "development-tools",
+    "langchain",
+    "aws",
+    "serverless"
+  ],
+  "author": "Your Name <your.email@example.com>",
+  "license": "MIT",
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.24.3",
+    "nodemailer": "^6.9.14",
+    "zod": "^3.23.8",
+    "dotenv": "^16.4.5"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.10",
+    "@types/nodemailer": "^6.4.15",
+    "@typescript-eslint/eslint-plugin": "^7.16.0",
+    "@typescript-eslint/parser": "^7.16.0",
+    "eslint": "^8.57.0",
+    "prettier": "^3.3.2",
+    "tsx": "^4.16.2",
+    "typescript": "^5.5.3"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yourusername/ai-research-automation.git"
+  },
+  "bugs": {
+    "url": "https://github.com/yourusername/ai-research-automation/issues"
+  },
+  "homepage": "https://github.com/yourusername/ai-research-automation#readme"
+}
