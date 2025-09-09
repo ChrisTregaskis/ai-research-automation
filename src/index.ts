@@ -100,20 +100,25 @@ async function runDailyResearch(): Promise<void> {
     // Validate environment and initialize services
     const env = await validateEnvironment();
     const { researchDeps, emailDeps } = await initializeServices(env);
+    const isTestMode = process.env.TEST_CONNECTIONS === 'true';
 
     // Get research topic (with optional day override)
     const topic = getCurrentTopic(dayOverride);
     if (!topic) {
-      if (dayOverride) {
-        logger.error(`No research topic found for day: ${dayOverride}`);
-      } else {
-        logger.info('No research scheduled for today (check SCHEDULE env var)');
+      if (!isTestMode) {
+        if (dayOverride) {
+          logger.error(`No research topic found for day: ${dayOverride}`);
+        } else {
+          logger.info('No research scheduled for today (check SCHEDULE env var)');
+        }
       }
       return;
     }
 
-    logger.info(`Research topic: ${topic.name}`);
-    logger.info(`Focus areas: ${topic.focusAreas.slice(0, 3).join(', ')}...`);
+    if (!isTestMode) {
+      logger.info(`Research topic: ${topic.name}`);
+      logger.info(`Focus areas: ${topic.focusAreas.slice(0, 3).join(', ')}...`);
+    }
 
     // Conduct research
     const researchResult = await conductResearch(researchDeps, topic);
@@ -122,8 +127,9 @@ async function runDailyResearch(): Promise<void> {
     logger.info(
       `  Token usage: ${researchResult.tokenUsage.input} input + ${researchResult.tokenUsage.output} output`
     );
-    logger.info(`  Sources found: ${researchResult.sources.length}`);
-    logger.info(`  Content length: ${researchResult.content.length} characters`);
+    logger.info(`  Sources found: ${researchResult.structuredData.sources.length}`);
+    logger.info(`  Findings: ${researchResult.structuredData.keyFindings.length}`);
+    logger.info(`  Resources: ${researchResult.structuredData.recommendedResources.length}`);
 
     // Send email summary
     await sendResearchSummary(emailDeps, researchResult);

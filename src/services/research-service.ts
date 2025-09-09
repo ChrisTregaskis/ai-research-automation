@@ -2,10 +2,18 @@ import Anthropic from '@anthropic-ai/sdk';
 import {
   ResearchTopic,
   ResearchResult,
+  StructuredResearch,
+  StructuredResearchSchema,
   ClaudeResponseSchema,
   ResearchAutomationError,
 } from '../types/schemas.js';
 import { createModuleLogger } from '../utils/logger.js';
+import { clearTerminalLine, loadingAnimation } from '../utils/terminal-animation.js';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const logger = createModuleLogger('research-service');
 
@@ -37,35 +45,38 @@ export async function conductResearch(
   deps: ResearchServiceDeps,
   topic: ResearchTopic
 ): Promise<ResearchResult> {
+  const isTestMode = process.env.TEST_CONNECTIONS === 'true';
+  logger.info(`Starting research ${isTestMode ? 'in TEST_MODE' : `for: ${topic.name}`}`);
+
+  const prompt = buildStructuredResearchPrompt(topic);
+
+  if (isTestMode) {
+    logger.info('Running in TEST_CONNECTIONS mode - minimal tokens and searches');
+  }
+
+  // Track claude query load time
+  const llmLoadTime = Date.now();
+  const loadingSpinner = loadingAnimation('Conducting research with Claude AI...');
+
+  const maxTokens = isTestMode ? 4000 : 8000;
+  const maxSearches = isTestMode ? 1 : 5; // KEEP in mind, more searches may yield better results BUT costs loads more
+
+  const clearState = () => {
+    clearInterval(loadingSpinner);
+    clearTerminalLine();
+  };
+
   try {
-    logger.info(`Starting research for: ${topic.name}`);
-
-    // Test mode configuration
-    const isTestMode = process.env.TEST_CONNECTIONS === 'true';
-    const prompt = buildResearchPrompt(topic);
-    logger.debug(`Research prompt generated for ${topic.id}`);
-
-    if (isTestMode) {
-      logger.debug(`Test mode prompt: ${prompt}`);
-      logger.info('Running in TEST_CONNECTIONS mode - minimal tokens and searches');
-    } else {
-      logger.info('Running in normal research mode');
-    }
-
-    const maxTokens = isTestMode ? 500 : 3000;
-    const maxSearches = isTestMode ? 1 : 5;
-
     const response = await deps.anthropicClient.messages.create({
       model: 'claude-sonnet-4-20250514',
       max_tokens: maxTokens,
-      temperature: 0.1, // Lower temperature for more focused, factual research
+      temperature: 0.1,
       messages: [
         {
           role: 'user',
           content: prompt,
         },
       ],
-      // Enable web search tool for real-time research capabilities
       tools: [
         {
           name: 'web_search',
@@ -75,44 +86,46 @@ export async function conductResearch(
       ],
     });
 
+    // Clean up terminal state
+    clearState();
+
+    if (response) {
+      // Write Claude response to last-llm-response file for logging/debugging
+      const fs = await import('fs/promises');
+      const logFilePath = path.resolve(__dirname, '../../notes/anthropic-logs/last-llm-response');
+      try {
+        await fs.writeFile(logFilePath, JSON.stringify(response, null, 2), 'utf8');
+      } catch (fileErr) {
+        logger.warn('Failed to write Claude response to last-llm-response file:', fileErr);
+      }
+      const llmDuration = Date.now() - llmLoadTime;
+      logger.info(`Claude response received in ${llmDuration}ms`);
+    }
+
     // Validate response using Zod schema
     const validatedResponse = ClaudeResponseSchema.parse(response);
     logger.success(
       `Response received: ${validatedResponse.usage.input_tokens} input + ${validatedResponse.usage.output_tokens} output tokens`
     );
 
-    // Token usage tracking
-    const totalTokens =
-      validatedResponse.usage.input_tokens + validatedResponse.usage.output_tokens;
-    logger.info(
-      `Total tokens used: ${totalTokens} (estimated cost: $${(totalTokens * 0.000003).toFixed(4)})`
-    );
-
-    // Log content block analysis
+    // Extract and parse structured research data
     const textBlocks = validatedResponse.content.filter(block => block.type === 'text');
-    const toolBlocks = validatedResponse.content.filter(block => block.type !== 'text');
-    logger.debug(`Content blocks: ${textBlocks.length} text, ${toolBlocks.length} tool use`);
-
-    // Extract text content from response (Claude's final research summary)
-    const textContent = textBlocks
+    const rawContent = textBlocks
       .map(block => (block as any).text)
       .filter(text => text && text.trim())
       .join('\n\n');
 
-    const content = textContent || '';
-
-    if (!content) {
+    if (!rawContent) {
       throw new ResearchAutomationError('Empty response from Claude API', 'EMPTY_RESPONSE');
     }
 
-    // Extract sources from the content
-    const sources = extractSourcesFromMarkdown(content);
+    // Parse structured data from Claude's response
+    const structuredData = parseStructuredResponse(rawContent);
 
     const result: ResearchResult = {
       topic,
-      content,
-      htmlContent: formatAsHtml(content, topic),
-      sources,
+      structuredData,
+      htmlContent: '', // Will be rendered by email service
       generatedAt: new Date(),
       tokenUsage: {
         input: validatedResponse.usage.input_tokens,
@@ -120,10 +133,19 @@ export async function conductResearch(
       },
     };
 
-    logger.success(`Research completed for ${topic.name}. Found ${sources.length} sources.`);
+    logger.success(
+      `Research completed for ${topic.name}. ` +
+        `Found ${structuredData.keyFindings.length} findings, ` +
+        `${structuredData.recommendedResources.length} resources, ` +
+        `${structuredData.sources.length} sources.`
+    );
+
     return result;
   } catch (error) {
-    logger.error(`Research failed for ${topic.name}:`, error);
+    logger.error(`Research failed ${isTestMode ? 'in TEST_MODE' : ` for ${topic.name}:`}`, error);
+
+    // Clean up terminal state
+    clearState();
 
     if (error instanceof Anthropic.APIError) {
       throw new ResearchAutomationError(
@@ -146,20 +168,55 @@ export async function conductResearch(
 }
 
 /**
- * Builds a research prompt for Claude based on topic configuration
+ * Builds a structured research prompt for Claude
  * @param topic - Research topic with focus areas and search terms
- * @returns Formatted prompt string for Claude API
+ * @returns Formatted prompt requesting structured JSON response
  */
-function buildResearchPrompt(topic: ResearchTopic): string {
+function buildStructuredResearchPrompt(topic: ResearchTopic): string {
   const isTestMode = process.env.TEST_CONNECTIONS === 'true';
 
   if (isTestMode) {
-    return `Search for "MCP (Model Context Protocol)" and provide:
-- Brief summary (1-2 sentences)
-- One key finding
-- Source link
+    return `Research new industry updates related "MCP (Model Context Protocol)", pay close attention to new MCP Servers available or emerging trends. Then return a JSON object with this exact structure:
 
-Markdown format only.`;
+{
+  "executiveSummary": "Brief 1-2 sentence summary",
+  "keyFindings": [
+    {
+      "title": "Finding title",
+      "description": "Brief description",
+      "category": "tool",
+      "importance": "high",
+      "actionable": true
+    }
+  ],
+  "recommendedResources": [
+    {
+      "name": "Resource name",
+      "url": "https://example.com",
+      "description": "Brief description",
+      "type": "documentation"
+    }
+  ],
+  "codeExamples": [],
+  "sources": [
+    {
+      "title": "Source title",
+      "url": "https://example.com",
+      "credibility": "official",
+      "relevance": "high"
+    }
+  ]
+}
+
+Important:
+- Return ONLY valid, complete JSON, with no truncation or missing brackets.
+- Wrap your output in triple backticks with a json tag, like this:
+\`\`\`
+\`\`\`json
+{ ...your JSON here... }
+\`\`\`
+\`\`\`
+- Do not include any other text, explanation, or formatting.`;
   }
 
   const focusAreasText = topic.focusAreas.slice(0, 4).join(', ');
@@ -170,207 +227,139 @@ Markdown format only.`;
 **Focus Areas:** ${focusAreasText}
 **Search Terms:** ${searchTermsText}
 
+Use web search to find current information and return ONLY a JSON object with this exact structure:
+
+{
+  "executiveSummary": "2-3 sentences summarizing the key findings and trends",
+  "keyFindings": [
+    {
+      "title": "Name of tool/framework/technique",
+      "description": "Detailed description of what it is and why it matters",
+      "category": "tool" | "framework" | "technique" | "update" | "trend",
+      "importance": "high" | "medium" | "low",
+      "actionable": true | false
+    }
+  ],
+  "recommendedResources": [
+    {
+      "name": "Resource name",
+      "url": "https://actual-working-url.com",
+      "description": "What this resource provides",
+      "type": "documentation" | "tutorial" | "tool" | "article" | "video" | "repository"
+    }
+  ],
+  "codeExamples": [
+    {
+      "title": "Example title",
+      "language": "typescript",
+      "code": "// Actual working code example",
+      "description": "What this code demonstrates"
+    }
+  ],
+  "sources": [
+    {
+      "title": "Source title from web search",
+      "url": "https://actual-source-url.com",
+      "credibility": "official" | "community" | "blog" | "news",
+      "relevance": "high" | "medium" | "low"
+    }
+  ]
+}
+
 Requirements:
-- Use web search for current information
-- Include practical examples where relevant
-- Provide source links for all claims
-- Output in markdown format only
+- Include 3-5 key findings
+- Include 3-6 recommended resources with working URLs
+- Include 1-2 practical code examples if relevant
+- Include all sources from web search
 
-Structure:
-## Executive Summary
-[2-3 sentences of key findings]
-
-## Key Developments
-- **Tool/Update Name**: Brief description [source link]
-- **Tool/Update Name**: Brief description [source link]
-
-## Practical Examples
-[Code snippets if relevant]
-
-## Resources
-- [Link text](URL) - Description
-- [Link text](URL) - Description`;
+Important:
+- Return ONLY valid, complete JSON, with no truncation or missing brackets.
+- Wrap your output in triple backticks with a json tag, like this:
+\`\`\`
+\`\`\`json
+{ ...your JSON here... }
+\`\`\`
+\`\`\`
+- Do not include any other text, explanation, or formatting.`;
 }
 
 /**
- * Extracts source links from research content using regex pattern matching
- * @param content - Raw research content from Claude
- * @returns Array of extracted source objects with title and URL
+ * Parses structured research response from Claude
+ * @param rawContent - Raw text response from Claude API
+ * @returns Validated structured research data
  */
-function extractSourcesFromMarkdown(
-  content: string
-): Array<{ title: string; url: string; description?: string }> {
-  const sources: Array<{ title: string; url: string; description?: string }> = [];
+function parseStructuredResponse(rawContent: string): StructuredResearch {
+  try {
+    // Claude might return the JSON wrapped in markdown code blocks or extra text
+    let jsonContent = rawContent.trim();
 
-  // Match markdown links [text](url) and extract more context
-  const linkRegex = /\[([^\]]+)\]\(([^)]+)\)/g;
-  let match;
-
-  while ((match = linkRegex.exec(content)) !== null) {
-    const title = match[1].trim();
-    const url = match[2].trim();
-
-    // URL validation
-    try {
-      const parsedUrl = new URL(url);
-      if (parsedUrl.protocol === 'http:' || parsedUrl.protocol === 'https:') {
-        // Avoid duplicates
-        if (!sources.find(s => s.url === url)) {
-          sources.push({
-            title,
-            url,
-            description: `Source from ${parsedUrl.hostname}`,
-          });
-        }
-      }
-    } catch {
-      logger.warn(`Skipping invalid URL: ${url}`);
+    // Extract JSON from code blocks if present
+    const jsonMatch = jsonContent.match(/```(?:json)?\s*(\{[\s\S]*\})\s*```/);
+    if (jsonMatch) {
+      jsonContent = jsonMatch[1];
     }
+
+    // Remove any leading/trailing text that isn't JSON
+    const jsonStart = jsonContent.indexOf('{');
+    const jsonEnd = jsonContent.lastIndexOf('}');
+
+    if (jsonStart !== -1 && jsonEnd !== -1 && jsonEnd > jsonStart) {
+      jsonContent = jsonContent.slice(jsonStart, jsonEnd + 1);
+    }
+
+    const parsedData = JSON.parse(jsonContent);
+
+    // Validate and transform the data using Zod
+    const validatedData = StructuredResearchSchema.parse(parsedData);
+
+    logger.debug('Successfully parsed structured research data');
+    return validatedData;
+  } catch (error) {
+    logger.error('Failed to parse structured response:', error);
+    logger.debug('Raw content:', rawContent);
+
+    // Return fallback structured data
+    return createFallbackStructuredData(rawContent);
   }
-
-  return sources;
 }
 
 /**
- * Converts research content to formatted HTML email template
- * @param content - Research content in markdown format
- * @param topic - Research topic for context and styling
- * @returns Complete HTML email string with styling and layout
+ * Creates fallback structured data when parsing fails
+ * @param rawContent - Original raw content from Claude
+ * @returns Basic structured research data
  */
-function formatAsHtml(content: string, topic: ResearchTopic): string {
-  const date = new Date().toLocaleDateString('en-GB', {
-    weekday: 'long',
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  });
+function createFallbackStructuredData(rawContent: string): StructuredResearch {
+  logger.warn('Using fallback structured data due to parsing failure');
 
-  // Markdown to HTML conversion
-  let htmlContent = content
-    // Headers
-    .replace(/^## (.+)$/gm, '<h2>$1</h2>')
-    .replace(/^### (.+)$/gm, '<h3>$1</h3>')
-    .replace(/^#### (.+)$/gm, '<h4>$1</h4>')
-    // Bold and italic
-    .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
-    .replace(/\*([^*]+)\*/g, '<em>$1</em>')
-    // Links with improved parsing
-    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>')
-    // Code blocks
-    .replace(/```([\s\S]*?)```/g, '<pre><code>$1</code></pre>')
-    .replace(/`([^`]+)`/g, '<code>$1</code>')
-    // Lists
-    .replace(/^\s*[-*+]\s+(.+)$/gm, '<li>$1</li>');
+  // Extract any URLs from the content as sources
+  const urlRegex = /https?:\/\/[^\s)]+/g;
+  const urls = rawContent.match(urlRegex) || [];
 
-  // Wrap consecutive <li> tags in <ul>
-  htmlContent = htmlContent.replace(/(<li>.*?<\/li>)(\s*<li>.*?<\/li>)*/gs, '<ul>$&</ul>');
-
-  // Split into paragraphs and clean up
-  const paragraphs = htmlContent
-    .split('\n\n')
-    .filter(p => p.trim())
-    .map(p => {
-      const trimmed = p.trim();
-      if (trimmed.startsWith('<h') || trimmed.startsWith('<ul') || trimmed.startsWith('<pre')) {
-        return trimmed;
-      }
-      return `<p>${trimmed}</p>`;
-    })
-    .join('\n\n');
-
-  // Email template with modern styling
-  return `<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AIRA: ${topic.name}</title>
-  <style>
-    body { 
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif; 
-      line-height: 1.6; 
-      color: #1f2937; 
-      max-width: 800px; 
-      margin: 0 auto; 
-      padding: 20px; 
-      background-color: #f9fafb;
-    }
-    .container {
-      background: white;
-      border-radius: 12px;
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-      overflow: hidden;
-    }
-    .header { 
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
-      color: white; 
-      padding: 24px; 
-      text-align: center;
-    }
-    .header h1 { margin: 0; font-size: 24px; font-weight: 600; }
-    .header p { margin: 8px 0 0 0; opacity: 0.9; font-size: 16px; }
-    .content { padding: 32px; }
-    h2 { 
-      color: #1e40af; 
-      border-bottom: 2px solid #e5e7eb; 
-      padding-bottom: 8px; 
-      margin-top: 32px; 
-      margin-bottom: 16px;
-    }
-    h3 { color: #1e3a8a; margin-top: 24px; margin-bottom: 12px; }
-    h4 { color: #312e81; margin-top: 20px; margin-bottom: 10px; }
-    pre { 
-      background: #f3f4f6; 
-      padding: 16px; 
-      border-radius: 8px; 
-      overflow-x: auto; 
-      font-size: 14px;
-      border-left: 4px solid #6366f1;
-    }
-    code { 
-      background: #f3f4f6; 
-      padding: 2px 6px; 
-      border-radius: 4px; 
-      font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace; 
-      font-size: 14px;
-    }
-    a { 
-      color: #2563eb; 
-      text-decoration: none; 
-      border-bottom: 1px solid transparent;
-      transition: border-color 0.2s;
-    }
-    a:hover { border-bottom-color: #2563eb; }
-    ul { margin: 12px 0; padding-left: 20px; }
-    li { margin: 6px 0; }
-    p { margin: 12px 0; }
-    .footer { 
-      margin-top: 32px; 
-      padding: 20px; 
-      background: #f9fafb; 
-      border-radius: 8px; 
-      font-size: 14px; 
-      color: #6b7280; 
-      text-align: center;
-    }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <div class="header">
-      <h1>AIRA: AI Research Automation</h1>
-      <p><strong>${topic.name}</strong> | ${date}</p>
-    </div>
-    
-    <div class="content">
-      ${paragraphs}
-    </div>
-    
-    <div class="footer">
-      <p>Generated by AIRA (AI Research Automation) | Powered by Claude Sonnet 4</p>
-      <p>Focus: ${topic.focusAreas.slice(0, 3).join(' • ')}</p>
-    </div>
-  </div>
-</body>
-</html>`;
+  return {
+    executiveSummary:
+      'Research data was received but could not be parsed into the expected structure. Please review the raw content.',
+    keyFindings: [
+      {
+        title: 'Parsing Error',
+        description:
+          'The research response could not be structured automatically. Manual review may be required.',
+        category: 'update' as const,
+        importance: 'medium' as const,
+        actionable: false,
+      },
+    ],
+    recommendedResources: urls.slice(0, 3).map((url, index) => ({
+      name: `Resource ${index + 1}`,
+      url,
+      description: 'Extracted from research content',
+      type: 'article' as const,
+    })),
+    codeExamples: [],
+    sources: urls.slice(0, 5).map((url, index) => ({
+      title: `Source ${index + 1}`,
+      url,
+      credibility: 'community' as const,
+      relevance: 'medium' as const,
+    })),
+  };
 }

@@ -76,18 +76,49 @@ export const EmailConfigSchema = z.object({
   text: z.string().optional(),
 });
 
-// Research result schema
-export const ResearchResultSchema = z.object({
-  topic: ResearchTopicSchema,
-  content: z.string(),
-  htmlContent: z.string(),
+// Structured research response from Claude
+export const StructuredResearchSchema = z.object({
+  executiveSummary: z.string().describe('2-3 sentence overview'),
+  keyFindings: z.array(
+    z.object({
+      title: z.string(),
+      description: z.string(),
+      category: z.enum(['tool', 'framework', 'technique', 'update', 'trend']),
+      importance: z.enum(['high', 'medium', 'low']),
+      actionable: z.boolean(),
+    })
+  ),
+  recommendedResources: z.array(
+    z.object({
+      name: z.string(),
+      url: z.string().url(),
+      description: z.string(),
+      type: z.enum(['documentation', 'tutorial', 'tool', 'article', 'video', 'repository']),
+    })
+  ),
+  codeExamples: z.array(
+    z.object({
+      title: z.string(),
+      language: z.string(),
+      code: z.string(),
+      description: z.string(),
+    })
+  ).optional(),
   sources: z.array(
     z.object({
       title: z.string(),
       url: z.string().url(),
-      description: z.string().optional(),
+      credibility: z.enum(['official', 'community', 'blog', 'news']),
+      relevance: z.enum(['high', 'medium', 'low']),
     })
   ),
+});
+
+// Research result schema
+export const ResearchResultSchema = z.object({
+  topic: ResearchTopicSchema,
+  structuredData: StructuredResearchSchema,
+  htmlContent: z.string(),
   generatedAt: z.date(),
   tokenUsage: z.object({
     input: z.number(),
@@ -109,6 +140,7 @@ export type Env = z.infer<typeof EnvSchema>;
 export type ResearchTopic = z.infer<typeof ResearchTopicSchema>;
 export type ClaudeResponse = z.infer<typeof ClaudeResponseSchema>;
 export type EmailConfig = z.infer<typeof EmailConfigSchema>;
+export type StructuredResearch = z.infer<typeof StructuredResearchSchema>;
 export type ResearchResult = z.infer<typeof ResearchResultSchema>;
 export type ApiError = z.infer<typeof ApiErrorSchema>;
 

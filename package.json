@@ -52,13 +52,18 @@
   "license": "MIT",
   "dependencies": {
     "@anthropic-ai/sdk": "^0.61.0",
+    "@react-email/components": "^0.0.25",
+    "@react-email/render": "^1.0.1",
     "dotenv": "^16.4.5",
     "nodemailer": "^6.9.14",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
     "zod": "^3.23.8"
   },
   "devDependencies": {
     "@types/node": "^20.14.10",
     "@types/nodemailer": "^6.4.15",
+    "@types/react": "^18.3.3",
     "@typescript-eslint/eslint-plugin": "^7.16.0",
     "@typescript-eslint/parser": "^7.16.0",
     "eslint": "^8.57.0",
