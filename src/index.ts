@@ -2,7 +2,11 @@
 
 import { config } from 'dotenv';
 import { conductResearch, createResearchDeps } from './services/research-service.js';
-import { sendResearchSummary, testEmailConfiguration, createEmailDeps } from './services/email-service.js';
+import {
+  sendResearchSummary,
+  testEmailConfiguration,
+  createEmailDeps,
+} from './services/email-service.js';
 import { getCurrentTopic } from './config/research-topics.js';
 import { EnvSchema, ConfigurationError, ResearchAutomationError } from './types/schemas.js';
 import { createModuleLogger } from './utils/logger.js';
@@ -27,9 +31,18 @@ async function validateEnvironment() {
       EMAIL_PORT: Number(process.env.EMAIL_PORT) || 587,
       EMAIL_RECIPIENTS: process.env.EMAIL_RECIPIENTS,
       NODE_ENV: process.env.NODE_ENV || 'development',
+      SCHEDULE: process.env.SCHEDULE,
     });
 
     logger.success('Environment validation passed');
+
+    // Log schedule configuration
+    if (env.SCHEDULE) {
+      logger.info(`Custom schedule configured: ${env.SCHEDULE}`);
+    } else {
+      logger.info('Using default Monday-Friday schedule');
+    }
+
     return env;
   } catch (error) {
     logger.error('Environment validation failed');
@@ -50,7 +63,7 @@ async function initializeServices(env: ReturnType<typeof EnvSchema.parse>) {
     logger.info('Initializing services...');
 
     const researchDeps = createResearchDeps(env.ANTHROPIC_API_KEY);
-    
+
     const emailDeps = createEmailDeps({
       host: env.EMAIL_HOST,
       port: env.EMAIL_PORT,
@@ -94,7 +107,7 @@ async function runDailyResearch(): Promise<void> {
       if (dayOverride) {
         logger.error(`No research topic found for day: ${dayOverride}`);
       } else {
-        logger.info('No research topic scheduled for today (weekend)');
+        logger.info('No research scheduled for today (check SCHEDULE env var)');
       }
       return;
     }
@@ -104,9 +117,11 @@ async function runDailyResearch(): Promise<void> {
 
     // Conduct research
     const researchResult = await conductResearch(researchDeps, topic);
-    
+
     logger.info('Research completed:');
-    logger.info(`  Token usage: ${researchResult.tokenUsage.input} input + ${researchResult.tokenUsage.output} output`);
+    logger.info(
+      `  Token usage: ${researchResult.tokenUsage.input} input + ${researchResult.tokenUsage.output} output`
+    );
     logger.info(`  Sources found: ${researchResult.sources.length}`);
     logger.info(`  Content length: ${researchResult.content.length} characters`);
 
@@ -117,24 +132,25 @@ async function runDailyResearch(): Promise<void> {
     logger.success(`Research automation completed successfully in ${duration.toFixed(1)}s`);
 
     // Log summary for monitoring
-    logger.info('\nSession Summary:');
+    logger.info('\\nSession Summary:');
     logger.info(`  Topic: ${topic.name}`);
     logger.info(`  Duration: ${duration.toFixed(1)}s`);
-    logger.info(`  Tokens used: ${researchResult.tokenUsage.input + researchResult.tokenUsage.output}`);
+    logger.info(
+      `  Tokens used: ${researchResult.tokenUsage.input + researchResult.tokenUsage.output}`
+    );
     logger.info(`  Email sent: YES`);
-
   } catch (error) {
     const duration = (Date.now() - startTime) / 1000;
     logger.error(`Research automation failed after ${duration.toFixed(1)}s`);
-    
+
     if (error instanceof ResearchAutomationError) {
       logger.error(`Error Type: ${error.code}`);
       logger.error(`Message: ${error.message}`);
-      
+
       if (error.statusCode) {
         logger.error(`Status Code: ${error.statusCode}`);
       }
-      
+
       if (error.retryAfter) {
         logger.error(`Retry After: ${error.retryAfter} seconds`);
       }
@@ -156,14 +172,14 @@ async function runDailyResearch(): Promise<void> {
  */
 async function main(): Promise<void> {
   const args = process.argv.slice(2);
-  
+
   if (args.includes('--test-email')) {
     logger.info('Running email configuration test...');
     try {
       const env = await validateEnvironment();
       const { emailDeps } = await initializeServices(env);
       const success = await testEmailConfiguration(emailDeps);
-      
+
       if (success) {
         logger.success('Email test completed successfully');
         process.exit(0);
@@ -206,11 +222,13 @@ Environment Variables Required:
   EMAIL_RECIPIENTS        Comma-separated list of recipient emails
   EMAIL_HOST              SMTP host (default: smtp.gmail.com)
   EMAIL_PORT              SMTP port (default: 587)
+  SCHEDULE                Comma-separated days (optional): mon,thu
 
 Examples:
   npm start                        # Run today's research
   npm run research:mon             # Test Monday's AI/ML research
   npm run test:email               # Test email configuration
+  SCHEDULE=mon,thu npm start       # Run with custom schedule
     `);
     return;
   }
@@ -224,14 +242,14 @@ process.on('unhandledRejection', (reason, promise) => {
   process.exit(1);
 });
 
-process.on('uncaughtException', (error) => {
+process.on('uncaughtException', error => {
   logger.error('Uncaught Exception:', error);
   process.exit(1);
 });
 
 // Run the application
 if (import.meta.url === `file://${process.argv[1]}`) {
-  main().catch((error) => {
+  main().catch(error => {
     logger.error('Application failed to start:', error);
     process.exit(1);
   });

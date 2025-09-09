@@ -10,6 +10,7 @@ export const EnvSchema = z.object({
   EMAIL_RECIPIENTS: z.string().min(1, 'At least one recipient required'),
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
   TEST_CONNECTIONS: z.string().optional(), // For testing mode
+  SCHEDULE: z.string().optional(), // Comma-separated days (e.g., "mon,thu")
 });
 
 // Research topic schema
@@ -30,18 +31,26 @@ const ClaudeContentBlock = z.discriminatedUnion('type', [
     text: z.string(),
   }),
   // Tool use blocks (research process, we can ignore these)
-  z.object({
-    type: z.literal('server_tool_use'),
-  }).passthrough(),
-  z.object({
-    type: z.literal('web_search_tool_result'),
-  }).passthrough(),
-  z.object({
-    type: z.literal('tool_use'),
-  }).passthrough(),
-  z.object({
-    type: z.literal('tool_result'),
-  }).passthrough(),
+  z
+    .object({
+      type: z.literal('server_tool_use'),
+    })
+    .passthrough(),
+  z
+    .object({
+      type: z.literal('web_search_tool_result'),
+    })
+    .passthrough(),
+  z
+    .object({
+      type: z.literal('tool_use'),
+    })
+    .passthrough(),
+  z
+    .object({
+      type: z.literal('tool_result'),
+    })
+    .passthrough(),
 ]);
 
 export const ClaudeResponseSchema = z.object({

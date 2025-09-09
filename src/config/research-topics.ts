@@ -2,7 +2,7 @@ import { ResearchTopic } from '../types/schemas.js';
 
 export const RESEARCH_TOPICS: ResearchTopic[] = [
   {
-    id: 'monday-ai-ml-tools',
+    id: 'ai-ml-tools',
     name: 'AI/ML Development Tools & LangChain Ecosystem',
     description: 'Latest AI/ML tools, LangChain/LangGraph updates, and development frameworks',
     focusAreas: [
@@ -11,7 +11,8 @@ export const RESEARCH_TOPICS: ResearchTopic[] = [
       'Machine learning model deployment tools',
       'AI agent frameworks and orchestration',
       'Vector databases and RAG implementations',
-      'AI debugging and monitoring tools'
+      'AI debugging and monitoring tools',
+      'Model Context Protocols (MCP) for AI/ML',
     ],
     searchTerms: [
       'LangChain updates 2025',
@@ -20,56 +21,13 @@ export const RESEARCH_TOPICS: ResearchTopic[] = [
       'vector database tools',
       'RAG implementation frameworks',
       'AI agent development',
-      'ML model deployment'
+      'ML model deployment',
+      'Model Context Protocols AI/ML',
     ],
-    dayOfWeek: 1
+    dayOfWeek: 1,
   },
   {
-    id: 'tuesday-react-ecosystem',
-    name: 'React/Next.js & TypeScript Ecosystem',
-    description: 'React, Next.js, TypeScript tools and best practices',
-    focusAreas: [
-      'React 19+ features and tools',
-      'Next.js App Router and server components',
-      'TypeScript tooling improvements',
-      'State management solutions',
-      'Testing frameworks (Vitest, Playwright)',
-      'Performance optimization tools'
-    ],
-    searchTerms: [
-      'React 19 new features',
-      'Next.js App Router tools',
-      'TypeScript development tools',
-      'Vitest testing updates',
-      'Playwright automation',
-      'React performance tools'
-    ],
-    dayOfWeek: 2
-  },
-  {
-    id: 'wednesday-aws-serverless',
-    name: 'AWS & Serverless Architecture (SST Focus)',
-    description: 'AWS services, serverless patterns, and SST (Serverless Stack) updates',
-    focusAreas: [
-      'SST (Serverless Stack) framework updates',
-      'AWS Lambda and serverless patterns',
-      'AWS CDK and infrastructure as code',
-      'API Gateway and serverless APIs',
-      'DynamoDB and serverless databases',
-      'AWS AI/ML services integration'
-    ],
-    searchTerms: [
-      'SST Serverless Stack updates',
-      'AWS Lambda new features',
-      'AWS CDK patterns',
-      'serverless architecture 2025',
-      'AWS API Gateway improvements',
-      'DynamoDB best practices'
-    ],
-    dayOfWeek: 3
-  },
-  {
-    id: 'thursday-devops-automation',
+    id: 'devops-automation',
     name: 'DevOps, CI/CD & Development Automation',
     description: 'DevOps tools, CI/CD improvements, and development automation',
     focusAreas: [
@@ -78,7 +36,7 @@ export const RESEARCH_TOPICS: ResearchTopic[] = [
       'Kubernetes development tools',
       'Infrastructure monitoring and observability',
       'Development environment automation',
-      'Security and compliance tools'
+      'Security and compliance tools',
     ],
     searchTerms: [
       'GitHub Actions new features',
@@ -86,12 +44,58 @@ export const RESEARCH_TOPICS: ResearchTopic[] = [
       'Kubernetes developer experience',
       'observability tools 2025',
       'development automation',
-      'DevSecOps tools'
+      'DevSecOps tools',
     ],
-    dayOfWeek: 4
+    dayOfWeek: 2,
   },
   {
-    id: 'friday-vscode-productivity',
+    id: 'aws-serverless',
+    name: 'AWS & Serverless Architecture (SST Focus)',
+    description: 'AWS services, serverless patterns, and SST (Serverless Stack) updates',
+    focusAreas: [
+      'SST (Serverless Stack) framework updates',
+      'AWS Lambda and serverless patterns',
+      'AWS CDK and infrastructure as code',
+      'API Gateway and serverless APIs',
+      'DynamoDB and serverless databases',
+      'AWS AI/ML services integration',
+    ],
+    searchTerms: [
+      'SST Serverless Stack updates',
+      'AWS Lambda new features',
+      'AWS CDK patterns',
+      'serverless architecture 2025',
+      'AWS API Gateway improvements',
+      'DynamoDB best practices',
+    ],
+    dayOfWeek: 3,
+  },
+  {
+    id: 'react-ecosystem',
+    name: 'React/Next.js & TypeScript Ecosystem',
+    description: 'React, Next.js, TypeScript tools and best practices',
+    focusAreas: [
+      'React 19+ features and tools',
+      'Next.js App Router and server components',
+      'TypeScript tooling improvements',
+      'State management solutions',
+      'Testing frameworks (Vitest, Playwright)',
+      'Performance optimization tools',
+      'Model Context Protocols (MCP) for React/TypeScript',
+    ],
+    searchTerms: [
+      'React 19 new features',
+      'Next.js App Router tools',
+      'TypeScript development tools',
+      'Vitest testing updates',
+      'Playwright automation',
+      'React performance tools',
+      'Model Context Protocols React TypeScript',
+    ],
+    dayOfWeek: 4,
+  },
+  {
+    id: 'vscode-productivity',
     name: 'VS Code Extensions & Developer Productivity',
     description: 'VS Code extensions, IDE improvements, and developer productivity tools',
     focusAreas: [
@@ -100,7 +104,8 @@ export const RESEARCH_TOPICS: ResearchTopic[] = [
       'Git and version control enhancements',
       'API development and testing tools',
       'Code generation and AI assistance',
-      'Developer workflow optimization'
+      'Developer workflow optimization',
+      'Model Context Protocols (MCP) for VS Code',
     ],
     searchTerms: [
       'VS Code AI extensions',
@@ -108,26 +113,58 @@ export const RESEARCH_TOPICS: ResearchTopic[] = [
       'Git productivity tools',
       'API testing tools',
       'code generation tools',
-      'developer productivity 2025'
+      'developer productivity 2025',
+      'Model Context Protocols VS Code',
     ],
-    dayOfWeek: 5
-  }
+    dayOfWeek: 5,
+  },
 ];
+
+/**
+ * Checks if research should run today based on SCHEDULE environment variable
+ * @returns boolean indicating if research should run
+ */
+export function shouldRunToday(): boolean {
+  const scheduleEnv = process.env.SCHEDULE?.toLowerCase();
+
+  if (!scheduleEnv) {
+    // Default: Monday through Friday
+    const today = new Date().getDay();
+    return today >= 1 && today <= 5;
+  }
+
+  // Parse SCHEDULE env var: "mon,thu" or "monday,thursday"
+  const allowedDays = scheduleEnv.split(',').map(day => day.trim());
+  const today = new Date();
+  const dayOfWeek = today.getDay();
+
+  // Map current day to abbreviations
+  const dayAbbreviations: Record<number, string[]> = {
+    1: ['mon', 'monday'],
+    2: ['tue', 'tuesday'],
+    3: ['wed', 'wednesday'],
+    4: ['thu', 'thursday'],
+    5: ['fri', 'friday'],
+  };
+
+  const todayAbbrs = dayAbbreviations[dayOfWeek] || [];
+  return allowedDays.some(day => todayAbbrs.includes(day));
+}
 
 /**
  * Day abbreviation mapping for CLI arguments
  */
 const DAY_ABBREVIATIONS: Record<string, number> = {
-  'mon': 1,
-  'tue': 2,
-  'wed': 3,
-  'thu': 4,
-  'fri': 5,
-  'monday': 1,
-  'tuesday': 2,
-  'wednesday': 3,
-  'thursday': 4,
-  'friday': 5,
+  mon: 1,
+  tue: 2,
+  wed: 3,
+  thu: 4,
+  fri: 5,
+  monday: 1,
+  tuesday: 2,
+  wednesday: 3,
+  thursday: 4,
+  friday: 5,
 };
 
 /**
@@ -150,29 +187,27 @@ export const getTopicByDayAbbr = (dayAbbr: string): ResearchTopic | null => {
 };
 
 /**
- * Gets current topic based on today's date or CLI override
- * @param dayOverride - Optional day override from CLI arguments
- * @returns Research topic or null if weekend/not found
+ * Enhanced getCurrentTopic that respects scheduling configuration
  */
 export const getCurrentTopic = (dayOverride?: string): ResearchTopic | null => {
-  // If day override provided via CLI, use that
+  // If day override provided, ignore scheduling constraints
   if (dayOverride) {
-    const topic = getTopicByDayAbbr(dayOverride);
-    if (topic) {
-      return topic;
-    }
-    // If invalid override, log warning but continue with normal logic
-    console.warn(`Warning: Unknown day abbreviation '${dayOverride}'. Using current day instead.`);
+    return getTopicByDayAbbr(dayOverride);
   }
 
-  // Default behavior: use current day
+  // Check if we should run today
+  if (!shouldRunToday()) {
+    console.info('Research not scheduled for today based on SCHEDULE environment variable');
+    return null;
+  }
+
   const today = new Date();
   const dayOfWeek = today.getDay();
-  
+
   // Handle weekends - default to Monday's topic
   if (dayOfWeek === 0 || dayOfWeek === 6) {
     return getTopicByDay(1);
   }
-  
+
   return getTopicByDay(dayOfWeek);
 };

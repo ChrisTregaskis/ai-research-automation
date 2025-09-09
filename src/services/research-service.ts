@@ -40,21 +40,20 @@ export async function conductResearch(
   try {
     logger.info(`Starting research for: ${topic.name}`);
 
-    const prompt = buildResearchPrompt(topic);
-    logger.debug(`Generated prompt for ${topic.id}`);
-    logger.info(`Prompt content: ${prompt}`);
-
     // Test mode configuration
     const isTestMode = process.env.TEST_CONNECTIONS === 'true';
-    const maxTokens = isTestMode ? 500 : 4000; // Reduced tokens for testing
-    const maxSearches = isTestMode ? 1 : 10; // Only 1 search for testing
-    logger.debug(`isTestMode: ${isTestMode}, maxTokens: ${maxTokens}, maxSearches: ${maxSearches}`);
+    const prompt = buildResearchPrompt(topic);
+    logger.debug(`Research prompt generated for ${topic.id}`);
 
     if (isTestMode) {
-      logger.info('Running in TEST_CONNECTIONS mode - reduced tokens and searches');
+      logger.debug(`Test mode prompt: ${prompt}`);
+      logger.info('Running in TEST_CONNECTIONS mode - minimal tokens and searches');
     } else {
       logger.info('Running in normal research mode');
     }
+
+    const maxTokens = isTestMode ? 500 : 3000;
+    const maxSearches = isTestMode ? 1 : 5;
 
     const response = await deps.anthropicClient.messages.create({
       model: 'claude-sonnet-4-20250514',
@@ -78,7 +77,16 @@ export async function conductResearch(
 
     // Validate response using Zod schema
     const validatedResponse = ClaudeResponseSchema.parse(response);
-    logger.success(`Received response: ${validatedResponse.usage.output_tokens} tokens`);
+    logger.success(
+      `Response received: ${validatedResponse.usage.input_tokens} input + ${validatedResponse.usage.output_tokens} output tokens`
+    );
+
+    // Token usage tracking
+    const totalTokens =
+      validatedResponse.usage.input_tokens + validatedResponse.usage.output_tokens;
+    logger.info(
+      `Total tokens used: ${totalTokens} (estimated cost: $${(totalTokens * 0.000003).toFixed(4)})`
+    );
 
     // Log content block analysis
     const textBlocks = validatedResponse.content.filter(block => block.type === 'text');
@@ -98,7 +106,7 @@ export async function conductResearch(
     }
 
     // Extract sources from the content
-    const sources = extractSources(content);
+    const sources = extractSourcesFromMarkdown(content);
 
     const result: ResearchResult = {
       topic,
@@ -138,57 +146,50 @@ export async function conductResearch(
 }
 
 /**
- * Builds a comprehensive research prompt for Claude based on topic configuration
+ * Builds a research prompt for Claude based on topic configuration
  * @param topic - Research topic with focus areas and search terms
  * @returns Formatted prompt string for Claude API
  */
 function buildResearchPrompt(topic: ResearchTopic): string {
-  // Check if we're in test mode
   const isTestMode = process.env.TEST_CONNECTIONS === 'true';
 
   if (isTestMode) {
-    return `Please use web search to find one recent article about "Next.js" and provide a brief summary.
-
-Please search for "Next.js 15" or "Next.js latest features" and format your response as:
+    return `Search for "MCP (Model Context Protocol)" and provide:
 - Brief summary (1-2 sentences)
 - One key finding
-- The source link
+- Source link
 
-This is a connection test to verify web search and response parsing work correctly.`;
+Markdown format only.`;
   }
 
-  const focusAreasText = topic.focusAreas.join(', ');
-  const searchTermsText = topic.searchTerms.join(', ');
+  const focusAreasText = topic.focusAreas.slice(0, 4).join(', ');
+  const searchTermsText = topic.searchTerms.slice(0, 5).join(', ');
 
-  return `Please use web search to investigate "${topic.name}" and provide a comprehensive research summary.
+  return `Research "${topic.name}" focusing on developments from the last 60 days.
 
-RESEARCH FOCUS:
-${topic.description}
+**Focus Areas:** ${focusAreasText}
+**Search Terms:** ${searchTermsText}
 
-KEY AREAS TO EXPLORE:
-${focusAreasText}
+Requirements:
+- Use web search for current information
+- Include practical examples where relevant
+- Provide source links for all claims
+- Output in markdown format only
 
-SEARCH TERMS TO PRIORITIZE:
-${searchTermsText}
+Structure:
+## Executive Summary
+[2-3 sentences of key findings]
 
-REQUIREMENTS:
-1. Use web search to find developments from the last 30-90 days
-2. Include practical implementation examples and code snippets where relevant
-3. Prioritize tools and updates that are production-ready or in stable beta
-4. Provide specific next steps and actionable recommendations
-5. Include hyperlinks to all sources (documentation, GitHub repos, official announcements)
-6. Ensure all information is current and verified through web search
+## Key Developments
+- **Tool/Update Name**: Brief description [source link]
+- **Tool/Update Name**: Brief description [source link]
 
-OUTPUT FORMAT:
-Please format your response as an email-ready summary with:
+## Practical Examples
+[Code snippets if relevant]
 
-- **Executive Summary** (2-3 sentences highlighting the most important findings)
-- **Key Developments** (3-5 major updates or new tools, with brief descriptions)
-- **Practical Examples** (code snippets or implementation patterns where relevant)
-- **Recommended Actions** (specific next steps for developers)
-- **Resources & Links** (all source links organized by category)
-
-Use professional but accessible language suitable for senior software engineers. Ensure all links are clickable hyperlinks with descriptive text.`;
+## Resources
+- [Link text](URL) - Description
+- [Link text](URL) - Description`;
 }
 
 /**
@@ -196,24 +197,33 @@ Use professional but accessible language suitable for senior software engineers.
  * @param content - Raw research content from Claude
  * @returns Array of extracted source objects with title and URL
  */
-function extractSources(
+function extractSourcesFromMarkdown(
   content: string
 ): Array<{ title: string; url: string; description?: string }> {
-  // Basic regex to extract links from markdown-style links [text](url)
-  const linkRegex = /\[([^\]]+)\]\(([^)]+)\)/g;
   const sources: Array<{ title: string; url: string; description?: string }> = [];
+
+  // Match markdown links [text](url) and extract more context
+  const linkRegex = /\[([^\]]+)\]\(([^)]+)\)/g;
   let match;
 
   while ((match = linkRegex.exec(content)) !== null) {
-    const title = match[1];
-    const url = match[2];
+    const title = match[1].trim();
+    const url = match[2].trim();
 
-    // Basic URL validation
+    // URL validation
     try {
-      new URL(url);
-      sources.push({ title, url });
+      const parsedUrl = new URL(url);
+      if (parsedUrl.protocol === 'http:' || parsedUrl.protocol === 'https:') {
+        // Avoid duplicates
+        if (!sources.find(s => s.url === url)) {
+          sources.push({
+            title,
+            url,
+            description: `Source from ${parsedUrl.hostname}`,
+          });
+        }
+      }
     } catch {
-      // Skip invalid URLs
       logger.warn(`Skipping invalid URL: ${url}`);
     }
   }
@@ -235,61 +245,131 @@ function formatAsHtml(content: string, topic: ResearchTopic): string {
     day: 'numeric',
   });
 
-  // Convert markdown to basic HTML
+  // Markdown to HTML conversion
   let htmlContent = content
+    // Headers
+    .replace(/^## (.+)$/gm, '<h2>$1</h2>')
+    .replace(/^### (.+)$/gm, '<h3>$1</h3>')
+    .replace(/^#### (.+)$/gm, '<h4>$1</h4>')
+    // Bold and italic
     .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
     .replace(/\*([^*]+)\*/g, '<em>$1</em>')
-    .replace(/^#\s+(.+)$/gm, '<h2>$1</h2>')
-    .replace(/^##\s+(.+)$/gm, '<h3>$1</h3>')
-    .replace(/^###\s+(.+)$/gm, '<h4>$1</h4>')
-    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>')
-    .replace(/```([^`]+)```/g, '<pre><code>$1</code></pre>')
+    // Links with improved parsing
+    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>')
+    // Code blocks
+    .replace(/```([\s\S]*?)```/g, '<pre><code>$1</code></pre>')
     .replace(/`([^`]+)`/g, '<code>$1</code>')
+    // Lists
     .replace(/^\s*[-*+]\s+(.+)$/gm, '<li>$1</li>');
 
   // Wrap consecutive <li> tags in <ul>
-  htmlContent = htmlContent.replace(/(<li>.*<\/li>)/g, '<ul>$1</ul>');
+  htmlContent = htmlContent.replace(/(<li>.*?<\/li>)(\s*<li>.*?<\/li>)*/gs, '<ul>$&</ul>');
 
-  // Split into paragraphs
+  // Split into paragraphs and clean up
   const paragraphs = htmlContent
     .split('\n\n')
     .filter(p => p.trim())
-    .map(p => (p.trim().startsWith('<') ? p : `<p>${p}</p>`))
-    .join('\n');
+    .map(p => {
+      const trimmed = p.trim();
+      if (trimmed.startsWith('<h') || trimmed.startsWith('<ul') || trimmed.startsWith('<pre')) {
+        return trimmed;
+      }
+      return `<p>${trimmed}</p>`;
+    })
+    .join('\n\n');
 
-  return `
-<!DOCTYPE html>
+  // Email template with modern styling
+  return `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AIRA: AI Development Tools Research - ${topic.name}</title>
+  <title>AIRA: ${topic.name}</title>
   <style>
-    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; max-width: 800px; margin: 0 auto; padding: 20px; }
-    h2 { color: #2563eb; border-bottom: 2px solid #e5e7eb; padding-bottom: 8px; }
-    h3 { color: #1e40af; margin-top: 24px; }
-    h4 { color: #1e3a8a; }
-    pre { background: #f3f4f6; padding: 16px; border-radius: 8px; overflow-x: auto; }
-    code { background: #f3f4f6; padding: 2px 4px; border-radius: 4px; font-family: 'Fira Code', monospace; }
-    a { color: #2563eb; text-decoration: none; }
-    a:hover { text-decoration: underline; }
-    ul { margin: 12px 0; }
+    body { 
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif; 
+      line-height: 1.6; 
+      color: #1f2937; 
+      max-width: 800px; 
+      margin: 0 auto; 
+      padding: 20px; 
+      background-color: #f9fafb;
+    }
+    .container {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+    }
+    .header { 
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+      color: white; 
+      padding: 24px; 
+      text-align: center;
+    }
+    .header h1 { margin: 0; font-size: 24px; font-weight: 600; }
+    .header p { margin: 8px 0 0 0; opacity: 0.9; font-size: 16px; }
+    .content { padding: 32px; }
+    h2 { 
+      color: #1e40af; 
+      border-bottom: 2px solid #e5e7eb; 
+      padding-bottom: 8px; 
+      margin-top: 32px; 
+      margin-bottom: 16px;
+    }
+    h3 { color: #1e3a8a; margin-top: 24px; margin-bottom: 12px; }
+    h4 { color: #312e81; margin-top: 20px; margin-bottom: 10px; }
+    pre { 
+      background: #f3f4f6; 
+      padding: 16px; 
+      border-radius: 8px; 
+      overflow-x: auto; 
+      font-size: 14px;
+      border-left: 4px solid #6366f1;
+    }
+    code { 
+      background: #f3f4f6; 
+      padding: 2px 6px; 
+      border-radius: 4px; 
+      font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace; 
+      font-size: 14px;
+    }
+    a { 
+      color: #2563eb; 
+      text-decoration: none; 
+      border-bottom: 1px solid transparent;
+      transition: border-color 0.2s;
+    }
+    a:hover { border-bottom-color: #2563eb; }
+    ul { margin: 12px 0; padding-left: 20px; }
     li { margin: 6px 0; }
-    .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 8px; margin-bottom: 24px; }
-    .footer { margin-top: 32px; padding: 16px; background: #f9fafb; border-radius: 8px; font-size: 14px; color: #6b7280; }
+    p { margin: 12px 0; }
+    .footer { 
+      margin-top: 32px; 
+      padding: 20px; 
+      background: #f9fafb; 
+      border-radius: 8px; 
+      font-size: 14px; 
+      color: #6b7280; 
+      text-align: center;
+    }
   </style>
 </head>
 <body>
-  <div class="header">
-    <h1>AIRA: AI Research Automation</h1>
-    <p><strong>${topic.name}</strong> | ${date}</p>
-  </div>
-  
-  ${paragraphs}
-  
-  <div class="footer">
-    <p>Generated by AIRA (AI Research Automation) | Powered by Claude Sonnet 4 with Web Search</p>
-    <p>Research focused on: ${topic.focusAreas.slice(0, 3).join(', ')}</p>
+  <div class="container">
+    <div class="header">
+      <h1>AIRA: AI Research Automation</h1>
+      <p><strong>${topic.name}</strong> | ${date}</p>
+    </div>
+    
+    <div class="content">
+      ${paragraphs}
+    </div>
+    
+    <div class="footer">
+      <p>Generated by AIRA (AI Research Automation) | Powered by Claude Sonnet 4</p>
+      <p>Focus: ${topic.focusAreas.slice(0, 3).join(' • ')}</p>
+    </div>
   </div>
 </body>
 </html>`;
