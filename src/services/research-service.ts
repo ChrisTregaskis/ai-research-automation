@@ -42,10 +42,23 @@ export async function conductResearch(
 
     const prompt = buildResearchPrompt(topic);
     logger.debug(`Generated prompt for ${topic.id}`);
+    logger.info(`Prompt content: ${prompt}`);
+
+    // Test mode configuration
+    const isTestMode = process.env.TEST_CONNECTIONS === 'true';
+    const maxTokens = isTestMode ? 500 : 4000; // Reduced tokens for testing
+    const maxSearches = isTestMode ? 1 : 10; // Only 1 search for testing
+    logger.debug(`isTestMode: ${isTestMode}, maxTokens: ${maxTokens}, maxSearches: ${maxSearches}`);
+
+    if (isTestMode) {
+      logger.info('Running in TEST_CONNECTIONS mode - reduced tokens and searches');
+    } else {
+      logger.info('Running in normal research mode');
+    }
 
     const response = await deps.anthropicClient.messages.create({
       model: 'claude-sonnet-4-20250514',
-      max_tokens: 4000,
+      max_tokens: maxTokens,
       temperature: 0.1, // Lower temperature for more focused, factual research
       messages: [
         {
@@ -58,7 +71,7 @@ export async function conductResearch(
         {
           name: 'web_search',
           type: 'web_search_20250305',
-          max_uses: 10, // Allow up to 10 searches for comprehensive research
+          max_uses: maxSearches,
         },
       ],
     });
@@ -67,15 +80,18 @@ export async function conductResearch(
     const validatedResponse = ClaudeResponseSchema.parse(response);
     logger.success(`Received response: ${validatedResponse.usage.output_tokens} tokens`);
 
-    // Log web search usage if available
-    if (validatedResponse.usage && 'server_tool_use' in validatedResponse.usage) {
-      const toolUsage = validatedResponse.usage.server_tool_use as any;
-      if (toolUsage?.web_search_requests) {
-        logger.info(`Web searches performed: ${toolUsage.web_search_requests}`);
-      }
-    }
+    // Log content block analysis
+    const textBlocks = validatedResponse.content.filter(block => block.type === 'text');
+    const toolBlocks = validatedResponse.content.filter(block => block.type !== 'text');
+    logger.debug(`Content blocks: ${textBlocks.length} text, ${toolBlocks.length} tool use`);
 
-    const content = validatedResponse.content[0]?.text || '';
+    // Extract text content from response (Claude's final research summary)
+    const textContent = textBlocks
+      .map(block => (block as any).text)
+      .filter(text => text && text.trim())
+      .join('\n\n');
+
+    const content = textContent || '';
 
     if (!content) {
       throw new ResearchAutomationError('Empty response from Claude API', 'EMPTY_RESPONSE');
@@ -127,6 +143,20 @@ export async function conductResearch(
  * @returns Formatted prompt string for Claude API
  */
 function buildResearchPrompt(topic: ResearchTopic): string {
+  // Check if we're in test mode
+  const isTestMode = process.env.TEST_CONNECTIONS === 'true';
+
+  if (isTestMode) {
+    return `Please use web search to find one recent article about "Next.js" and provide a brief summary.
+
+Please search for "Next.js 15" or "Next.js latest features" and format your response as:
+- Brief summary (1-2 sentences)
+- One key finding
+- The source link
+
+This is a connection test to verify web search and response parsing work correctly.`;
+  }
+
   const focusAreasText = topic.focusAreas.join(', ');
   const searchTermsText = topic.searchTerms.join(', ');
 

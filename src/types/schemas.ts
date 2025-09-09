@@ -9,6 +9,7 @@ export const EnvSchema = z.object({
   EMAIL_PORT: z.number().default(587),
   EMAIL_RECIPIENTS: z.string().min(1, 'At least one recipient required'),
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
+  TEST_CONNECTIONS: z.string().optional(), // For testing mode
 });
 
 // Research topic schema
@@ -21,17 +22,33 @@ export const ResearchTopicSchema = z.object({
   dayOfWeek: z.number().min(1).max(5), // Monday = 1, Friday = 5
 });
 
-// Claude API response schema
+// Claude API response schema with support for research tools
+const ClaudeContentBlock = z.discriminatedUnion('type', [
+  // Text content blocks (what we want for the final response)
+  z.object({
+    type: z.literal('text'),
+    text: z.string(),
+  }),
+  // Tool use blocks (research process, we can ignore these)
+  z.object({
+    type: z.literal('server_tool_use'),
+  }).passthrough(),
+  z.object({
+    type: z.literal('web_search_tool_result'),
+  }).passthrough(),
+  z.object({
+    type: z.literal('tool_use'),
+  }).passthrough(),
+  z.object({
+    type: z.literal('tool_result'),
+  }).passthrough(),
+]);
+
 export const ClaudeResponseSchema = z.object({
   id: z.string(),
   type: z.literal('message'),
   role: z.literal('assistant'),
-  content: z.array(
-    z.object({
-      type: z.literal('text'),
-      text: z.string(),
-    })
-  ),
+  content: z.array(ClaudeContentBlock),
   model: z.string(),
   stop_reason: z.string().nullable(),
   stop_sequence: z.string().nullable(),

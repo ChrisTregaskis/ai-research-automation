@@ -1,0 +1,1028 @@
+[2025-09-08T17:15:10.782Z] [research-service] DEBUG: Generated prompt for tuesday-react-ecosystem
+[2025-09-08T17:16:58.758Z] [research-service] ERROR: Research failed for React/Next.js & TypeScript Ecosystem: ZodError: [
+  {
+    "received": "server_tool_use",
+    "code": "invalid_literal",
+    "expected": "text",
+    "path": [
+      "content",
+      1,
+      "type"
+    ],
+    "message": "Invalid literal value, expected \"text\""
+  },
+  {
+    "code": "invalid_type",
+    "expected": "string",
+    "received": "undefined",
+    "path": [
+      "content",
+      1,
+      "text"
+    ],
+    "message": "Required"
+  },
+  {
+    "received": "web_search_tool_result",
+    "code": "invalid_literal",
+    "expected": "text",
+    "path": [
+      "content",
+      2,
+      "type"
+    ],
+    "message": "Invalid literal value, expected \"text\""
+  },
+  {
+    "code": "invalid_type",
+    "expected": "string",
+    "received": "undefined",
+    "path": [
+      "content",
+      2,
+      "text"
+    ],
+    "message": "Required"
+  },
+  {
+    "received": "server_tool_use",
+    "code": "invalid_literal",
+    "expected": "text",
+    "path": [
+      "content",
+      3,
+      "type"
+    ],
+    "message": "Invalid literal value, expected \"text\""
+  },
+  {
+    "code": "invalid_type",
+    "expected": "string",
+    "received": "undefined",
+    "path": [
+      "content",
+      3,
+      "text"
+    ],
+    "message": "Required"
+  },
+  {
+    "received": "web_search_tool_result",
+    "code": "invalid_literal",
+    "expected": "text",
+    "path": [
+      "content",
+      4,
+      "type"
+    ],
+    "message": "Invalid literal value, expected \"text\""
+  },
+  {
+    "code": "invalid_type",
+    "expected": "string",
+    "received": "undefined",
+    "path": [
+      "content",
+      4,
+      "text"
+    ],
+    "message": "Required"
+  },
+  {
+    "received": "server_tool_use",
+    "code": "invalid_literal",
+    "expected": "text",
+    "path": [
+      "content",
+      5,
+      "type"
+    ],
+    "message": "Invalid literal value, expected \"text\""
+  },
+  {
+    "code": "invalid_type",
+    "expected": "string",
+    "received": "undefined",
+    "path": [
+      "content",
+      5,
+      "text"
+    ],
+    "message": "Required"
+  },
+  {
+    "received": "web_search_tool_result",
+    "code": "invalid_literal",
+    "expected": "text",
+    "path": [
+      "content",
+      6,
+      "type"
+    ],
+    "message": "Invalid literal value, expected \"text\""
+  },
+  {
+    "code": "invalid_type",
+    "expected": "string",
+    "received": "undefined",
+    "path": [
+      "content",
+      6,
+      "text"
+    ],
+    "message": "Required"
+  },
+  {
+    "received": "server_tool_use",
+    "code": "invalid_literal",
+    "expected": "text",
+    "path": [
+      "content",
+      7,
+      "type"
+    ],
+    "message": "Invalid literal value, expected \"text\""
+  },
+  {
+    "code": "invalid_type",
+    "expected": "string",
+    "received": "undefined",
+    "path": [
+      "content",
+      7,
+      "text"
+    ],
+    "message": "Required"
+  },
+  {
+    "received": "web_search_tool_result",
+    "code": "invalid_literal",
+    "expected": "text",
+    "path": [
+      "content",
+      8,
+      "type"
+    ],
+    "message": "Invalid literal value, expected \"text\""
+  },
+  {
+    "code": "invalid_type",
+    "expected": "string",
+    "received": "undefined",
+    "path": [
+      "content",
+      8,
+      "text"
+    ],
+    "message": "Required"
+  },
+  {
+    "received": "server_tool_use",
+    "code": "invalid_literal",
+    "expected": "text",
+    "path": [
+      "content",
+      9,
+      "type"
+    ],
+    "message": "Invalid literal value, expected \"text\""
+  },
+  {
+    "code": "invalid_type",
+    "expected": "string",
+    "received": "undefined",
+    "path": [
+      "content",
+      9,
+      "text"
+    ],
+    "message": "Required"
+  },
+  {
+    "received": "web_search_tool_result",
+    "code": "invalid_literal",
+    "expected": "text",
+    "path": [
+      "content",
+      10,
+      "type"
+    ],
+    "message": "Invalid literal value, expected \"text\""
+  },
+  {
+    "code": "invalid_type",
+    "expected": "string",
+    "received": "undefined",
+    "path": [
+      "content",
+      10,
+      "text"
+    ],
+    "message": "Required"
+  },
+  {
+    "received": "server_tool_use",
+    "code": "invalid_literal",
+    "expected": "text",
+    "path": [
+      "content",
+      11,
+      "type"
+    ],
+    "message": "Invalid literal value, expected \"text\""
+  },
+  {
+    "code": "invalid_type",
+    "expected": "string",
+    "received": "undefined",
+    "path": [
+      "content",
+      11,
+      "text"
+    ],
+    "message": "Required"
+  },
+  {
+    "received": "web_search_tool_result",
+    "code": "invalid_literal",
+    "expected": "text",
+    "path": [
+      "content",
+      12,
+      "type"
+    ],
+    "message": "Invalid literal value, expected \"text\""
+  },
+  {
+    "code": "invalid_type",
+    "expected": "string",
+    "received": "undefined",
+    "path": [
+      "content",
+      12,
+      "text"
+    ],
+    "message": "Required"
+  },
+  {
+    "received": "server_tool_use",
+    "code": "invalid_literal",
+    "expected": "text",
+    "path": [
+      "content",
+      13,
+      "type"
+    ],
+    "message": "Invalid literal value, expected \"text\""
+  },
+  {
+    "code": "invalid_type",
+    "expected": "string",
+    "received": "undefined",
+    "path": [
+      "content",
+      13,
+      "text"
+    ],
+    "message": "Required"
+  },
+  {
+    "received": "web_search_tool_result",
+    "code": "invalid_literal",
+    "expected": "text",
+    "path": [
+      "content",
+      14,
+      "type"
+    ],
+    "message": "Invalid literal value, expected \"text\""
+  },
+  {
+    "code": "invalid_type",
+    "expected": "string",
+    "received": "undefined",
+    "path": [
+      "content",
+      14,
+      "text"
+    ],
+    "message": "Required"
+  }
+]
+    at get error (file:///Users/Christopherdavid.t/CodeChris/pocs/ai-research-automation/node_modules/zod/v3/types.js:39:31)
+    at ZodObject.parse (file:///Users/Christopherdavid.t/CodeChris/pocs/ai-research-automation/node_modules/zod/v3/types.js:114:22)
+    at conductResearch (file:///Users/Christopherdavid.t/CodeChris/pocs/ai-research-automation/dist/services/research-service.js:46:56)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async runDailyResearch (file:///Users/Christopherdavid.t/CodeChris/pocs/ai-research-automation/dist/index.js:94:32)
+    at async main (file:///Users/Christopherdavid.t/CodeChris/pocs/ai-research-automation/dist/index.js:197:5) {
+  issues: [
+    {
+      received: 'server_tool_use',
+      code: 'invalid_literal',
+      expected: 'text',
+      path: [Array],
+      message: 'Invalid literal value, expected "text"'
+    },
+    {
+      code: 'invalid_type',
+      expected: 'string',
+      received: 'undefined',
+      path: [Array],
+      message: 'Required'
+    },
+    {
+      received: 'web_search_tool_result',
+      code: 'invalid_literal',
+      expected: 'text',
+      path: [Array],
+      message: 'Invalid literal value, expected "text"'
+    },
+    {
+      code: 'invalid_type',
+      expected: 'string',
+      received: 'undefined',
+      path: [Array],
+      message: 'Required'
+    },
+    {
+      received: 'server_tool_use',
+      code: 'invalid_literal',
+      expected: 'text',
+      path: [Array],
+      message: 'Invalid literal value, expected "text"'
+    },
+    {
+      code: 'invalid_type',
+      expected: 'string',
+      received: 'undefined',
+      path: [Array],
+      message: 'Required'
+    },
+    {
+      received: 'web_search_tool_result',
+      code: 'invalid_literal',
+      expected: 'text',
+      path: [Array],
+      message: 'Invalid literal value, expected "text"'
+    },
+    {
+      code: 'invalid_type',
+      expected: 'string',
+      received: 'undefined',
+      path: [Array],
+      message: 'Required'
+    },
+    {
+      received: 'server_tool_use',
+      code: 'invalid_literal',
+      expected: 'text',
+      path: [Array],
+      message: 'Invalid literal value, expected "text"'
+    },
+    {
+      code: 'invalid_type',
+      expected: 'string',
+      received: 'undefined',
+      path: [Array],
+      message: 'Required'
+    },
+    {
+      received: 'web_search_tool_result',
+      code: 'invalid_literal',
+      expected: 'text',
+      path: [Array],
+      message: 'Invalid literal value, expected "text"'
+    },
+    {
+      code: 'invalid_type',
+      expected: 'string',
+      received: 'undefined',
+      path: [Array],
+      message: 'Required'
+    },
+    {
+      received: 'server_tool_use',
+      code: 'invalid_literal',
+      expected: 'text',
+      path: [Array],
+      message: 'Invalid literal value, expected "text"'
+    },
+    {
+      code: 'invalid_type',
+      expected: 'string',
+      received: 'undefined',
+      path: [Array],
+      message: 'Required'
+    },
+    {
+      received: 'web_search_tool_result',
+      code: 'invalid_literal',
+      expected: 'text',
+      path: [Array],
+      message: 'Invalid literal value, expected "text"'
+    },
+    {
+      code: 'invalid_type',
+      expected: 'string',
+      received: 'undefined',
+      path: [Array],
+      message: 'Required'
+    },
+    {
+      received: 'server_tool_use',
+      code: 'invalid_literal',
+      expected: 'text',
+      path: [Array],
+      message: 'Invalid literal value, expected "text"'
+    },
+    {
+      code: 'invalid_type',
+      expected: 'string',
+      received: 'undefined',
+      path: [Array],
+      message: 'Required'
+    },
+    {
+      received: 'web_search_tool_result',
+      code: 'invalid_literal',
+      expected: 'text',
+      path: [Array],
+      message: 'Invalid literal value, expected "text"'
+    },
+    {
+      code: 'invalid_type',
+      expected: 'string',
+      received: 'undefined',
+      path: [Array],
+      message: 'Required'
+    },
+    {
+      received: 'server_tool_use',
+      code: 'invalid_literal',
+      expected: 'text',
+      path: [Array],
+      message: 'Invalid literal value, expected "text"'
+    },
+    {
+      code: 'invalid_type',
+      expected: 'string',
+      received: 'undefined',
+      path: [Array],
+      message: 'Required'
+    },
+    {
+      received: 'web_search_tool_result',
+      code: 'invalid_literal',
+      expected: 'text',
+      path: [Array],
+      message: 'Invalid literal value, expected "text"'
+    },
+    {
+      code: 'invalid_type',
+      expected: 'string',
+      received: 'undefined',
+      path: [Array],
+      message: 'Required'
+    },
+    {
+      received: 'server_tool_use',
+      code: 'invalid_literal',
+      expected: 'text',
+      path: [Array],
+      message: 'Invalid literal value, expected "text"'
+    },
+    {
+      code: 'invalid_type',
+      expected: 'string',
+      received: 'undefined',
+      path: [Array],
+      message: 'Required'
+    },
+    {
+      received: 'web_search_tool_result',
+      code: 'invalid_literal',
+      expected: 'text',
+      path: [Array],
+      message: 'Invalid literal value, expected "text"'
+    },
+    {
+      code: 'invalid_type',
+      expected: 'string',
+      received: 'undefined',
+      path: [Array],
+      message: 'Required'
+    }
+  ],
+  addIssue: [Function (anonymous)],
+  addIssues: [Function (anonymous)],
+  errors: [
+    {
+      received: 'server_tool_use',
+      code: 'invalid_literal',
+      expected: 'text',
+      path: [Array],
+      message: 'Invalid literal value, expected "text"'
+    },
+    {
+      code: 'invalid_type',
+      expected: 'string',
+      received: 'undefined',
+      path: [Array],
+      message: 'Required'
+    },
+    {
+      received: 'web_search_tool_result',
+      code: 'invalid_literal',
+      expected: 'text',
+      path: [Array],
+      message: 'Invalid literal value, expected "text"'
+    },
+    {
+      code: 'invalid_type',
+      expected: 'string',
+      received: 'undefined',
+      path: [Array],
+      message: 'Required'
+    },
+    {
+      received: 'server_tool_use',
+      code: 'invalid_literal',
+      expected: 'text',
+      path: [Array],
+      message: 'Invalid literal value, expected "text"'
+    },
+    {
+      code: 'invalid_type',
+      expected: 'string',
+      received: 'undefined',
+      path: [Array],
+      message: 'Required'
+    },
+    {
+      received: 'web_search_tool_result',
+      code: 'invalid_literal',
+      expected: 'text',
+      path: [Array],
+      message: 'Invalid literal value, expected "text"'
+    },
+    {
+      code: 'invalid_type',
+      expected: 'string',
+      received: 'undefined',
+      path: [Array],
+      message: 'Required'
+    },
+    {
+      received: 'server_tool_use',
+      code: 'invalid_literal',
+      expected: 'text',
+      path: [Array],
+      message: 'Invalid literal value, expected "text"'
+    },
+    {
+      code: 'invalid_type',
+      expected: 'string',
+      received: 'undefined',
+      path: [Array],
+      message: 'Required'
+    },
+    {
+      received: 'web_search_tool_result',
+      code: 'invalid_literal',
+      expected: 'text',
+      path: [Array],
+      message: 'Invalid literal value, expected "text"'
+    },
+    {
+      code: 'invalid_type',
+      expected: 'string',
+      received: 'undefined',
+      path: [Array],
+      message: 'Required'
+    },
+    {
+      received: 'server_tool_use',
+      code: 'invalid_literal',
+      expected: 'text',
+      path: [Array],
+      message: 'Invalid literal value, expected "text"'
+    },
+    {
+      code: 'invalid_type',
+      expected: 'string',
+      received: 'undefined',
+      path: [Array],
+      message: 'Required'
+    },
+    {
+      received: 'web_search_tool_result',
+      code: 'invalid_literal',
+      expected: 'text',
+      path: [Array],
+      message: 'Invalid literal value, expected "text"'
+    },
+    {
+      code: 'invalid_type',
+      expected: 'string',
+      received: 'undefined',
+      path: [Array],
+      message: 'Required'
+    },
+    {
+      received: 'server_tool_use',
+      code: 'invalid_literal',
+      expected: 'text',
+      path: [Array],
+      message: 'Invalid literal value, expected "text"'
+    },
+    {
+      code: 'invalid_type',
+      expected: 'string',
+      received: 'undefined',
+      path: [Array],
+      message: 'Required'
+    },
+    {
+      received: 'web_search_tool_result',
+      code: 'invalid_literal',
+      expected: 'text',
+      path: [Array],
+      message: 'Invalid literal value, expected "text"'
+    },
+    {
+      code: 'invalid_type',
+      expected: 'string',
+      received: 'undefined',
+      path: [Array],
+      message: 'Required'
+    },
+    {
+      received: 'server_tool_use',
+      code: 'invalid_literal',
+      expected: 'text',
+      path: [Array],
+      message: 'Invalid literal value, expected "text"'
+    },
+    {
+      code: 'invalid_type',
+      expected: 'string',
+      received: 'undefined',
+      path: [Array],
+      message: 'Required'
+    },
+    {
+      received: 'web_search_tool_result',
+      code: 'invalid_literal',
+      expected: 'text',
+      path: [Array],
+      message: 'Invalid literal value, expected "text"'
+    },
+    {
+      code: 'invalid_type',
+      expected: 'string',
+      received: 'undefined',
+      path: [Array],
+      message: 'Required'
+    },
+    {
+      received: 'server_tool_use',
+      code: 'invalid_literal',
+      expected: 'text',
+      path: [Array],
+      message: 'Invalid literal value, expected "text"'
+    },
+    {
+      code: 'invalid_type',
+      expected: 'string',
+      received: 'undefined',
+      path: [Array],
+      message: 'Required'
+    },
+    {
+      received: 'web_search_tool_result',
+      code: 'invalid_literal',
+      expected: 'text',
+      path: [Array],
+      message: 'Invalid literal value, expected "text"'
+    },
+    {
+      code: 'invalid_type',
+      expected: 'string',
+      received: 'undefined',
+      path: [Array],
+      message: 'Required'
+    }
+  ]
+}
+[2025-09-08T17:16:58.761Z] [main] ERROR: Research automation failed after 108.0s
+[2025-09-08T17:16:58.761Z] [main] ERROR: Error Type: UNEXPECTED_ERROR
+[2025-09-08T17:16:58.761Z] [main] ERROR: Message: Unexpected error during research: [
+  {
+    "received": "server_tool_use",
+    "code": "invalid_literal",
+    "expected": "text",
+    "path": [
+      "content",
+      1,
+      "type"
+    ],
+    "message": "Invalid literal value, expected \"text\""
+  },
+  {
+    "code": "invalid_type",
+    "expected": "string",
+    "received": "undefined",
+    "path": [
+      "content",
+      1,
+      "text"
+    ],
+    "message": "Required"
+  },
+  {
+    "received": "web_search_tool_result",
+    "code": "invalid_literal",
+    "expected": "text",
+    "path": [
+      "content",
+      2,
+      "type"
+    ],
+    "message": "Invalid literal value, expected \"text\""
+  },
+  {
+    "code": "invalid_type",
+    "expected": "string",
+    "received": "undefined",
+    "path": [
+      "content",
+      2,
+      "text"
+    ],
+    "message": "Required"
+  },
+  {
+    "received": "server_tool_use",
+    "code": "invalid_literal",
+    "expected": "text",
+    "path": [
+      "content",
+      3,
+      "type"
+    ],
+    "message": "Invalid literal value, expected \"text\""
+  },
+  {
+    "code": "invalid_type",
+    "expected": "string",
+    "received": "undefined",
+    "path": [
+      "content",
+      3,
+      "text"
+    ],
+    "message": "Required"
+  },
+  {
+    "received": "web_search_tool_result",
+    "code": "invalid_literal",
+    "expected": "text",
+    "path": [
+      "content",
+      4,
+      "type"
+    ],
+    "message": "Invalid literal value, expected \"text\""
+  },
+  {
+    "code": "invalid_type",
+    "expected": "string",
+    "received": "undefined",
+    "path": [
+      "content",
+      4,
+      "text"
+    ],
+    "message": "Required"
+  },
+  {
+    "received": "server_tool_use",
+    "code": "invalid_literal",
+    "expected": "text",
+    "path": [
+      "content",
+      5,
+      "type"
+    ],
+    "message": "Invalid literal value, expected \"text\""
+  },
+  {
+    "code": "invalid_type",
+    "expected": "string",
+    "received": "undefined",
+    "path": [
+      "content",
+      5,
+      "text"
+    ],
+    "message": "Required"
+  },
+  {
+    "received": "web_search_tool_result",
+    "code": "invalid_literal",
+    "expected": "text",
+    "path": [
+      "content",
+      6,
+      "type"
+    ],
+    "message": "Invalid literal value, expected \"text\""
+  },
+  {
+    "code": "invalid_type",
+    "expected": "string",
+    "received": "undefined",
+    "path": [
+      "content",
+      6,
+      "text"
+    ],
+    "message": "Required"
+  },
+  {
+    "received": "server_tool_use",
+    "code": "invalid_literal",
+    "expected": "text",
+    "path": [
+      "content",
+      7,
+      "type"
+    ],
+    "message": "Invalid literal value, expected \"text\""
+  },
+  {
+    "code": "invalid_type",
+    "expected": "string",
+    "received": "undefined",
+    "path": [
+      "content",
+      7,
+      "text"
+    ],
+    "message": "Required"
+  },
+  {
+    "received": "web_search_tool_result",
+    "code": "invalid_literal",
+    "expected": "text",
+    "path": [
+      "content",
+      8,
+      "type"
+    ],
+    "message": "Invalid literal value, expected \"text\""
+  },
+  {
+    "code": "invalid_type",
+    "expected": "string",
+    "received": "undefined",
+    "path": [
+      "content",
+      8,
+      "text"
+    ],
+    "message": "Required"
+  },
+  {
+    "received": "server_tool_use",
+    "code": "invalid_literal",
+    "expected": "text",
+    "path": [
+      "content",
+      9,
+      "type"
+    ],
+    "message": "Invalid literal value, expected \"text\""
+  },
+  {
+    "code": "invalid_type",
+    "expected": "string",
+    "received": "undefined",
+    "path": [
+      "content",
+      9,
+      "text"
+    ],
+    "message": "Required"
+  },
+  {
+    "received": "web_search_tool_result",
+    "code": "invalid_literal",
+    "expected": "text",
+    "path": [
+      "content",
+      10,
+      "type"
+    ],
+    "message": "Invalid literal value, expected \"text\""
+  },
+  {
+    "code": "invalid_type",
+    "expected": "string",
+    "received": "undefined",
+    "path": [
+      "content",
+      10,
+      "text"
+    ],
+    "message": "Required"
+  },
+  {
+    "received": "server_tool_use",
+    "code": "invalid_literal",
+    "expected": "text",
+    "path": [
+      "content",
+      11,
+      "type"
+    ],
+    "message": "Invalid literal value, expected \"text\""
+  },
+  {
+    "code": "invalid_type",
+    "expected": "string",
+    "received": "undefined",
+    "path": [
+      "content",
+      11,
+      "text"
+    ],
+    "message": "Required"
+  },
+  {
+    "received": "web_search_tool_result",
+    "code": "invalid_literal",
+    "expected": "text",
+    "path": [
+      "content",
+      12,
+      "type"
+    ],
+    "message": "Invalid literal value, expected \"text\""
+  },
+  {
+    "code": "invalid_type",
+    "expected": "string",
+    "received": "undefined",
+    "path": [
+      "content",
+      12,
+      "text"
+    ],
+    "message": "Required"
+  },
+  {
+    "received": "server_tool_use",
+    "code": "invalid_literal",
+    "expected": "text",
+    "path": [
+      "content",
+      13,
+      "type"
+    ],
+    "message": "Invalid literal value, expected \"text\""
+  },
+  {
+    "code": "invalid_type",
+    "expected": "string",
+    "received": "undefined",
+    "path": [
+      "content",
+      13,
+      "text"
+    ],
+    "message": "Required"
+  },
+  {
+    "received": "web_search_tool_result",
+    "code": "invalid_literal",
+    "expected": "text",
+    "path": [
+      "content",
+      14,
+      "type"
+    ],
+    "message": "Invalid literal value, expected \"text\""
+  },
+  {
+    "code": "invalid_type",
+    "expected": "string",
+    "received": "undefined",
+    "path": [
+      "content",
+      14,
+      "text"
+    ],
+    "message": "Required"
+  }
+]

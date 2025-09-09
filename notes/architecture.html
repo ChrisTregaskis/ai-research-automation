@@ -1,0 +1,550 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI Research Automation - Architecture Wireframe</title>
+    <style>
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        margin: 0;
+        padding: 20px;
+        background: #f8fafc;
+        color: #334155;
+      }
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+      }
+      .header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 24px;
+        text-align: center;
+      }
+      .header h1 {
+        margin: 0;
+        font-size: 28px;
+        font-weight: 600;
+      }
+      .header p {
+        margin: 8px 0 0 0;
+        opacity: 0.9;
+      }
+      .content {
+        padding: 32px;
+      }
+      .flow-section {
+        margin-bottom: 48px;
+      }
+      .flow-section h2 {
+        color: #1e293b;
+        font-size: 24px;
+        margin-bottom: 24px;
+        border-bottom: 2px solid #e2e8f0;
+        padding-bottom: 8px;
+      }
+      .flow-diagram {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
+      .flow-step {
+        background: #f1f5f9;
+        border: 2px solid #e2e8f0;
+        border-radius: 8px;
+        padding: 20px;
+        position: relative;
+      }
+      .flow-step.trigger {
+        background: #ecfdf5;
+        border-color: #10b981;
+      }
+      .flow-step.process {
+        background: #eff6ff;
+        border-color: #3b82f6;
+      }
+      .flow-step.external {
+        background: #fef3c7;
+        border-color: #f59e0b;
+      }
+      .flow-step.output {
+        background: #f3e8ff;
+        border-color: #8b5cf6;
+      }
+      .step-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 12px;
+      }
+      .step-number {
+        background: #334155;
+        color: white;
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        font-weight: 600;
+      }
+      .step-title {
+        font-size: 18px;
+        font-weight: 600;
+        color: #1e293b;
+      }
+      .step-details {
+        margin-left: 40px;
+      }
+      .step-tech {
+        background: #1e293b;
+        color: white;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 12px;
+        font-weight: 500;
+        display: inline-block;
+        margin-right: 8px;
+        margin-bottom: 8px;
+      }
+      .arrow {
+        text-align: center;
+        color: #64748b;
+        font-size: 24px;
+        margin: 8px 0;
+      }
+      .integration-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 24px;
+        margin-top: 24px;
+      }
+      .integration-card {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        padding: 20px;
+      }
+      .integration-card h3 {
+        color: #1e293b;
+        margin: 0 0 12px 0;
+        font-size: 18px;
+      }
+      .integration-card .type {
+        background: #e2e8f0;
+        color: #475569;
+        padding: 2px 8px;
+        border-radius: 4px;
+        font-size: 12px;
+        margin-bottom: 12px;
+        display: inline-block;
+      }
+      .file-structure {
+        background: #1e293b;
+        color: #e2e8f0;
+        padding: 20px;
+        border-radius: 8px;
+        font-family: 'Monaco', 'Menlo', monospace;
+        font-size: 14px;
+        margin-top: 24px;
+        overflow-x: auto;
+      }
+      .file-structure .folder {
+        color: #60a5fa;
+      }
+      .file-structure .file {
+        color: #a78bfa;
+      }
+      .file-structure .config {
+        color: #fbbf24;
+      }
+      .dependency-flow {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 16px;
+        margin-top: 24px;
+      }
+      .dependency-box {
+        background: white;
+        border: 2px solid #e2e8f0;
+        border-radius: 8px;
+        padding: 16px;
+        flex: 1;
+        min-width: 200px;
+      }
+      .dependency-box h4 {
+        margin: 0 0 8px 0;
+        color: #1e293b;
+      }
+      .dependency-box .deps {
+        font-size: 14px;
+        color: #64748b;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1>AI Research Automation</h1>
+        <p>Functional Architecture with Dependency Injection</p>
+      </div>
+
+      <div class="content">
+        <!-- Main Flow -->
+        <div class="flow-section">
+          <h2>1. Application Flow & Data Pipeline</h2>
+          <div class="flow-diagram">
+            <div class="flow-step trigger">
+              <div class="step-header">
+                <div class="step-number">1</div>
+                <div class="step-title">Trigger</div>
+              </div>
+              <div class="step-details">
+                <span class="step-tech">GitHub Actions</span>
+                <span class="step-tech">Cron Schedule</span>
+                <p>Monday-Friday at 9 AM UTC. Manual triggers available for testing.</p>
+              </div>
+            </div>
+
+            <div class="arrow">↓</div>
+
+            <div class="flow-step process">
+              <div class="step-header">
+                <div class="step-number">2</div>
+                <div class="step-title">Environment Validation</div>
+              </div>
+              <div class="step-details">
+                <span class="step-tech">Zod Schema</span>
+                <span class="step-tech">TypeScript</span>
+                <p><strong>File:</strong> src/index.ts → validateEnvironment()</p>
+                <p>Validates API keys, email config, recipients using strict type checking.</p>
+              </div>
+            </div>
+
+            <div class="arrow">↓</div>
+
+            <div class="flow-step process">
+              <div class="step-header">
+                <div class="step-number">3</div>
+                <div class="step-title">Dependency Injection</div>
+              </div>
+              <div class="step-details">
+                <span class="step-tech">Functional DI</span>
+                <span class="step-tech">Pure Functions</span>
+                <p><strong>File:</strong> src/index.ts → initializeServices()</p>
+                <p>Creates service dependencies: Anthropic client, SMTP transporter.</p>
+              </div>
+            </div>
+
+            <div class="arrow">↓</div>
+
+            <div class="flow-step process">
+              <div class="step-header">
+                <div class="step-number">4</div>
+                <div class="step-title">Topic Selection</div>
+              </div>
+              <div class="step-details">
+                <span class="step-tech">Topic Engine</span>
+                <span class="step-tech">Day-based Routing</span>
+                <p><strong>File:</strong> config/research-topics.ts → getCurrentTopic()</p>
+                <p>Selects research topic based on current day of week (Mon-Fri rotation).</p>
+              </div>
+            </div>
+
+            <div class="arrow">↓</div>
+
+            <div class="flow-step external">
+              <div class="step-header">
+                <div class="step-number">5</div>
+                <div class="step-title">AI Research</div>
+              </div>
+              <div class="step-details">
+                <span class="step-tech">Claude Sonnet 4</span>
+                <span class="step-tech">Research Tool</span>
+                <p><strong>File:</strong> src/services/research-service.ts → conductResearch()</p>
+                <p>Sends structured prompt to Claude, receives and validates response.</p>
+              </div>
+            </div>
+
+            <div class="arrow">↓</div>
+
+            <div class="flow-step process">
+              <div class="step-header">
+                <div class="step-number">6</div>
+                <div class="step-title">Content Processing</div>
+              </div>
+              <div class="step-details">
+                <span class="step-tech">HTML Generation</span>
+                <span class="step-tech">Link Extraction</span>
+                <p><strong>File:</strong> src/services/research-service.ts → formatAsHtml()</p>
+                <p>Converts markdown to HTML, extracts sources, applies email styling.</p>
+              </div>
+            </div>
+
+            <div class="arrow">↓</div>
+
+            <div class="flow-step external">
+              <div class="step-header">
+                <div class="step-number">7</div>
+                <div class="step-title">Email Delivery</div>
+              </div>
+              <div class="step-details">
+                <span class="step-tech">SMTP</span>
+                <span class="step-tech">Nodemailer</span>
+                <p><strong>File:</strong> src/services/email-service.ts → sendResearchSummary()</p>
+                <p>Sends formatted HTML email to configured recipients via Gmail SMTP.</p>
+              </div>
+            </div>
+
+            <div class="arrow">↓</div>
+
+            <div class="flow-step output">
+              <div class="step-header">
+                <div class="step-number">8</div>
+                <div class="step-title">Logging & Monitoring</div>
+              </div>
+              <div class="step-details">
+                <span class="step-tech">Custom Logger</span>
+                <span class="step-tech">GitHub Actions</span>
+                <p><strong>File:</strong> src/utils/logger.ts</p>
+                <p>
+                  Logs success metrics, token usage, errors with stack traces to GitHub Actions.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- External Integrations -->
+        <div class="flow-section">
+          <h2>2. External Integrations & APIs</h2>
+          <div class="integration-grid">
+            <div class="integration-card">
+              <h3>Anthropic Claude API</h3>
+              <div class="type">AI Research Provider</div>
+              <p><strong>Endpoint:</strong> https://api.anthropic.com/v1/messages</p>
+              <p><strong>Model:</strong> claude-sonnet-4-20250514</p>
+              <p><strong>Authentication:</strong> API Key (Bearer token)</p>
+              <p><strong>Rate Limits:</strong> Handled with exponential backoff</p>
+              <p><strong>Cost:</strong> £18/month (Claude Pro subscription)</p>
+            </div>
+
+            <div class="integration-card">
+              <h3>Gmail SMTP</h3>
+              <div class="type">Email Delivery Service</div>
+              <p><strong>Host:</strong> smtp.gmail.com</p>
+              <p><strong>Port:</strong> 587 (TLS)</p>
+              <p><strong>Authentication:</strong> App Password (not regular password)</p>
+              <p><strong>Security:</strong> TLS encryption, 2FA required</p>
+              <p><strong>Cost:</strong> Free</p>
+            </div>
+
+            <div class="integration-card">
+              <h3>GitHub Actions</h3>
+              <div class="type">CI/CD & Automation</div>
+              <p><strong>Triggers:</strong> Cron schedule (Mon-Fri 9 AM UTC)</p>
+              <p><strong>Runtime:</strong> Ubuntu Latest, Node.js 20</p>
+              <p><strong>Secrets:</strong> ANTHROPIC_API_KEY, EMAIL_* vars</p>
+              <p><strong>Monitoring:</strong> Step summaries, failure notifications</p>
+              <p><strong>Cost:</strong> Free (2,000 minutes/month)</p>
+            </div>
+
+            <div class="integration-card">
+              <h3>NPM Registry</h3>
+              <div class="type">Package Management</div>
+              <p><strong>Key Dependencies:</strong></p>
+              <p>• @anthropic-ai/sdk (Claude integration)</p>
+              <p>• nodemailer (Email delivery)</p>
+              <p>• zod (Runtime validation)</p>
+              <p>• typescript (Type safety)</p>
+              <p><strong>Cost:</strong> Free (public packages)</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Functional Architecture -->
+        <div class="flow-section">
+          <h2>3. Functional Architecture & Dependency Flow</h2>
+          <div class="dependency-flow">
+            <div class="dependency-box">
+              <h4>Main Application</h4>
+              <div class="deps">
+                <strong>File:</strong> src/index.ts<br />
+                <strong>Imports:</strong> All services, config, utils<br />
+                <strong>Role:</strong> Orchestration, error handling, CLI
+              </div>
+            </div>
+
+            <div class="dependency-box">
+              <h4>Research Service</h4>
+              <div class="deps">
+                <strong>File:</strong> src/services/research-service.ts<br />
+                <strong>Dependencies:</strong> Anthropic client<br />
+                <strong>Functions:</strong> conductResearch(), formatAsHtml()
+              </div>
+            </div>
+
+            <div class="dependency-box">
+              <h4>Email Service</h4>
+              <div class="deps">
+                <strong>File:</strong> src/services/email-service.ts<br />
+                <strong>Dependencies:</strong> Nodemailer transporter<br />
+                <strong>Functions:</strong> sendResearchSummary(), testEmailConfiguration()
+              </div>
+            </div>
+
+            <div class="dependency-box">
+              <h4>Logger Utility</h4>
+              <div class="deps">
+                <strong>File:</strong> src/utils/logger.ts<br />
+                <strong>Dependencies:</strong> None (pure utility)<br />
+                <strong>Functions:</strong> createLogger(), createModuleLogger()
+              </div>
+            </div>
+
+            <div class="dependency-box">
+              <h4>Type System</h4>
+              <div class="deps">
+                <strong>File:</strong> src/types/schemas.ts<br />
+                <strong>Dependencies:</strong> Zod validation library<br />
+                <strong>Exports:</strong> All TypeScript types, Zod schemas
+              </div>
+            </div>
+
+            <div class="dependency-box">
+              <h4>Configuration</h4>
+              <div class="deps">
+                <strong>File:</strong> config/research-topics.ts<br />
+                <strong>Dependencies:</strong> Type definitions<br />
+                <strong>Functions:</strong> getCurrentTopic(), getTopicByDay()
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- File Structure -->
+        <div class="flow-section">
+          <h2>4. Project Structure & File Organization</h2>
+          <div class="file-structure">
+            ai-research-automation/ ├── <span class="config">package.json</span> # Dependencies &
+            scripts ├── <span class="config">tsconfig.json</span> # TypeScript configuration ├──
+            <span class="config">.env.example</span> # Environment template ├──
+            <span class="config">.gitignore</span> # Git ignore patterns ├──
+            <span class="config">.eslintrc.json</span> # Linting rules ├──
+            <span class="config">.prettierrc</span> # Code formatting ├──
+            <span class="file">README.md</span> # Documentation │ ├──
+            <span class="folder">src/</span> # Source code │ ├──
+            <span class="file">index.ts</span> # Main entry point │ ├──
+            <span class="folder">types/</span> │ │ └── <span class="file">schemas.ts</span> # Zod
+            schemas & types │ ├── <span class="folder">services/</span> # Business logic │ │ ├──
+            <span class="file">research-service.ts</span> # Claude integration │ │ └──
+            <span class="file">email-service.ts</span> # Email delivery │ └──
+            <span class="folder">utils/</span> │ └── <span class="file">logger.ts</span> # Logging
+            utility │ ├── <span class="folder">config/</span> # Configuration │ └──
+            <span class="file">research-topics.ts</span> # Research topics │ ├──
+            <span class="folder">.github/</span> # GitHub automation │ └──
+            <span class="folder">workflows/</span> │ └──
+            <span class="file">daily-research.yml</span> # CI/CD pipeline │ └──
+            <span class="folder">dist/</span> # Compiled JavaScript (generated)
+          </div>
+        </div>
+
+        <!-- Key Design Decisions -->
+        <div class="flow-section">
+          <h2>5. Key Architecture Decisions</h2>
+          <div class="integration-grid">
+            <div class="integration-card">
+              <h3>Functional Composition</h3>
+              <div class="type">Architecture Pattern</div>
+              <p>
+                <strong>Why:</strong> Better testability, easier composition, modern TypeScript
+                practices
+              </p>
+              <p>
+                <strong>Implementation:</strong> Pure functions with dependency injection via
+                parameters
+              </p>
+              <p><strong>Benefits:</strong> Immutable, predictable, easy to reason about</p>
+            </div>
+
+            <div class="integration-card">
+              <h3>Dependency Injection</h3>
+              <div class="type">Design Pattern</div>
+              <p><strong>Why:</strong> Loose coupling, easy testing, clear dependencies</p>
+              <p>
+                <strong>Implementation:</strong> createXxxDeps() functions return configured
+                dependencies
+              </p>
+              <p><strong>Benefits:</strong> Mockable, testable, maintainable</p>
+            </div>
+
+            <div class="integration-card">
+              <h3>Type Safety</h3>
+              <div class="type">Code Quality</div>
+              <p><strong>Why:</strong> Catch errors at compile time, better IDE support</p>
+              <p><strong>Implementation:</strong> Strict TypeScript + Zod runtime validation</p>
+              <p><strong>Benefits:</strong> Fewer runtime errors, self-documenting code</p>
+            </div>
+
+            <div class="integration-card">
+              <h3>Contextual Logging</h3>
+              <div class="type">Observability</div>
+              <p><strong>Why:</strong> Easy debugging, clear error sources</p>
+              <p><strong>Implementation:</strong> Module-specific loggers with colored output</p>
+              <p><strong>Benefits:</strong> Quick issue identification, better monitoring</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Error Handling Flow -->
+        <div class="flow-section">
+          <h2>6. Error Handling & Recovery</h2>
+          <div class="flow-diagram">
+            <div class="flow-step process">
+              <div class="step-header">
+                <div class="step-number">1</div>
+                <div class="step-title">Error Detection</div>
+              </div>
+              <div class="step-details">
+                <p>Custom error types: ResearchAutomationError, ConfigurationError</p>
+                <p>Zod validation catches configuration issues early</p>
+              </div>
+            </div>
+
+            <div class="arrow">↓</div>
+
+            <div class="flow-step process">
+              <div class="step-header">
+                <div class="step-number">2</div>
+                <div class="step-title">Error Classification</div>
+              </div>
+              <div class="step-details">
+                <p>API errors, email errors, configuration errors handled differently</p>
+                <p>Includes error codes, retry timing, and actionable messages</p>
+              </div>
+            </div>
+
+            <div class="arrow">↓</div>
+
+            <div class="flow-step process">
+              <div class="step-header">
+                <div class="step-number">3</div>
+                <div class="step-title">Logging & Monitoring</div>
+              </div>
+              <div class="step-details">
+                <p>Detailed stack traces, contextual information</p>
+                <p>GitHub Actions failure notifications with logs</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
