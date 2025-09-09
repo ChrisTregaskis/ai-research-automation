@@ -11,16 +11,19 @@ This is built in such a way that we may be able to swap out context and desired 
 - **Smart Scheduling**: Monday-Friday rotation covering AI/ML, React, AWS/Serverless, DevOps, and VS Code tools
 - **Type-Safe**: Built with TypeScript and Zod for runtime validation
 - **GitHub Actions**: Free, reliable automation with version control
-- **Budget-Friendly**: Only £18/month (Claude Pro subscription as it is currently)
 
-## Research Schedule
+## Considerations
+
+- **Budget!!**: Currently utilising web_search tool against calude API is EXPENSIVE.
+
+## Example research Schedule
 
 | Day           | Topic                      | Focus Areas                                                  |
 | ------------- | -------------------------- | ------------------------------------------------------------ |
 | **Monday**    | AI/ML Tools & LangChain    | LangChain/LangGraph updates, AI frameworks, vector databases |
-| **Tuesday**   | React/Next.js & TypeScript | React 19+, Next.js App Router, TypeScript tooling, testing   |
+| **Tuesday**   | DevOps & CI/CD             | GitHub Actions, Docker, Kubernetes, observability tools      |
 | **Wednesday** | AWS & Serverless (SST)     | SST framework, Lambda patterns, AWS CDK, serverless APIs     |
-| **Thursday**  | DevOps & CI/CD             | GitHub Actions, Docker, Kubernetes, observability tools      |
+| **Thursday**  | React/Next.js & TypeScript | React 19+, Next.js App Router, TypeScript tooling, testing   |
 | **Friday**    | VS Code & Productivity     | Extensions, IDE improvements, developer workflow tools       |
 
 ## Tech Stack
