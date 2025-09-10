@@ -2,17 +2,16 @@ import { ResearchTopic } from '../types/schemas.js';
 
 export const RESEARCH_TOPICS: ResearchTopic[] = [
   {
-    id: 'ai-ml-tools',
-    name: 'AI/ML Development Tools & LangChain Ecosystem',
-    description: 'Latest AI/ML tools, LangChain/LangGraph updates, and development frameworks',
+    id: 'ai-tools',
+    name: 'AI Development Tools & LangChain Ecosystem',
+    description: 'Latest AI tools, LangChain/LangGraph updates, and development frameworks',
     focusAreas: [
       'LangChain and LangGraph framework updates',
       'AI development tools and SDKs',
-      'Machine learning model deployment tools',
       'AI agent frameworks and orchestration',
       'Vector databases and RAG implementations',
       'AI debugging and monitoring tools',
-      'Model Context Protocols (MCP) for AI/ML',
+      'Model Context Protocols (MCP) for AI',
     ],
     searchTerms: [
       'LangChain updates 2025',
@@ -21,8 +20,7 @@ export const RESEARCH_TOPICS: ResearchTopic[] = [
       'vector database tools',
       'RAG implementation frameworks',
       'AI agent development',
-      'ML model deployment',
-      'Model Context Protocols AI/ML',
+      'Model Context Protocols AI',
     ],
     dayOfWeek: 1,
   },

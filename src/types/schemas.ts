@@ -83,7 +83,20 @@ export const StructuredResearchSchema = z.object({
     z.object({
       title: z.string(),
       description: z.string(),
-      category: z.enum(['tool', 'framework', 'technique', 'update', 'trend']),
+      category: z.enum([
+        'tool',
+        'framework',
+        'technique',
+        'update',
+        'trend',
+        'mcp-server',
+        'mcp-client',
+        'integration',
+        'protocol-update',
+        'sdk',
+        'community-tool',
+        'specification',
+      ]),
       importance: z.enum(['high', 'medium', 'low']),
       actionable: z.boolean(),
     })
@@ -96,14 +109,16 @@ export const StructuredResearchSchema = z.object({
       type: z.enum(['documentation', 'tutorial', 'tool', 'article', 'video', 'repository']),
     })
   ),
-  codeExamples: z.array(
-    z.object({
-      title: z.string(),
-      language: z.string(),
-      code: z.string(),
-      description: z.string(),
-    })
-  ).optional(),
+  codeExamples: z
+    .array(
+      z.object({
+        title: z.string(),
+        language: z.string(),
+        code: z.string(),
+        description: z.string(),
+      })
+    )
+    .optional(),
   sources: z.array(
     z.object({
       title: z.string(),

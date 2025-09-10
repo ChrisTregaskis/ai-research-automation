@@ -59,7 +59,7 @@ export async function conductResearch(
   const loadingSpinner = loadingAnimation('Conducting research with Claude AI...');
 
   const maxTokens = isTestMode ? 4000 : 8000;
-  const maxSearches = isTestMode ? 1 : 5; // KEEP in mind, more searches may yield better results BUT costs loads more
+  const maxSearches = isTestMode ? 2 : 5; // KEEP in mind, more searches may yield better results BUT costs loads more
 
   const clearState = () => {
     clearInterval(loadingSpinner);
@@ -176,37 +176,68 @@ function buildStructuredResearchPrompt(topic: ResearchTopic): string {
   const isTestMode = process.env.TEST_CONNECTIONS === 'true';
 
   if (isTestMode) {
-    return `Research new industry updates related "MCP (Model Context Protocol)", pay close attention to new MCP Servers available or emerging trends. Then return a JSON object with this exact structure:
+    return `Research new industry updates related "MCP (Model Context Protocol)", pay close attention to new MCP Servers available or emerging trends. Assume general MCP knowledge already exists for consumer of this research.
+
+
+Focus specifically on:
+- New MCP server implementations and tools
+- Platform integrations (especially Claude, VS Code, GitHub)
+- Developer SDKs and client library updates
+- Real-world implementation examples and use cases
+- Protocol specification changes or updates
+- Community-built MCP servers and tools
+
+Include specific examples with:
+- Code snippets where relevant
+- Links to GitHub repositories
+- Official documentation updates
+- Developer tutorials and guides
+- All source links as clickable hyperlinks
+    
+Use web search to find current information and return ONLY a JSON object with this exact structure:
 
 {
-  "executiveSummary": "Brief 1-2 sentence summary",
+  "executiveSummary": "Brief 1-2 sentence summary of latest MCP developments, integrations, and their impact on developers",
   "keyFindings": [
     {
-      "title": "Finding title",
-      "description": "Brief description",
-      "category": "tool",
-      "importance": "high",
+      "title": "New MCP Server for GitHub Integration",
+      "description": "Detailed description of the MCP development, integration, or tool",
+      "category": "mcp-server|mcp-client|integration|protocol-update|sdk|community-tool|specification",
+      "importance": "high|medium|low",
       "actionable": true
     }
   ],
   "recommendedResources": [
     {
-      "name": "Resource name",
+      "name": "Official MCP TypeScript SDK",
       "url": "https://example.com",
-      "description": "Brief description",
-      "type": "documentation"
+      "description": "Brief description focusing on MCP implementation value",
+      "type": "documentation|tutorial|tool|article|video|repository"
     }
   ],
-  "codeExamples": [],
+  "codeExamples": [
+    {
+      "title": "Basic MCP Server Setup",
+      "language": "typescript|javascript|json|bash",
+      "code": "// Actual working MCP implementation code",
+      "description": "What this MCP code demonstrates and how to use it"
+    }
+  ],
   "sources": [
     {
       "title": "Source title",
       "url": "https://example.com",
-      "credibility": "official",
-      "relevance": "high"
+      "credibility": "official|community|blog|news",
+      "relevance": "high|medium|low"
     }
   ]
 }
+
+Requirements:
+- Include 3-5 key findings
+- Include 3-5 recommended resources with working URLs
+- Include 2-3 practical code examples if relevant
+- Include all sources from web search
 
 Important:
 - Return ONLY valid, complete JSON, with no truncation or missing brackets.
@@ -222,7 +253,7 @@ Important:
   const focusAreasText = topic.focusAreas.slice(0, 4).join(', ');
   const searchTermsText = topic.searchTerms.slice(0, 5).join(', ');
 
-  return `Research "${topic.name}" focusing on developments from the last 60 days.
+  return `Research "${topic.name}" focusing on developments from the last 60 days. Assume the reader has professional understanding of the topic.
 
 **Focus Areas:** ${focusAreasText}
 **Search Terms:** ${searchTermsText}
@@ -268,8 +299,8 @@ Use web search to find current information and return ONLY a JSON object with th
 
 Requirements:
 - Include 3-5 key findings
-- Include 3-6 recommended resources with working URLs
-- Include 1-2 practical code examples if relevant
+- Include 3-5 recommended resources with working URLs
+- Include 2-3 practical code examples if relevant
 - Include all sources from web search
 
 Important:
